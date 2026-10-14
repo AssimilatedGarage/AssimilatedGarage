@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "assimilated-garage",
+  "compatibility_date": "2026-10-12",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "dist"
+  },
+  "routes": [
+    { "pattern": "assimilatedgarage.com", "custom_domain": true },
+    { "pattern": "www.assimilatedgarage.com", "custom_domain": true }
+  ]
+}

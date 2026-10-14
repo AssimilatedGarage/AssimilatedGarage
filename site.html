@@ -1,0 +1,733 @@
+<title>Assimilated Garage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Assimilated Garage: pallet finds, parts, hardware, tools and everything else, priced to move.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Public+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a garage at night. A live 3D pallet under a work light opens the page; below it a shelf of price-tag cards, a grading chart, how-to-buy, and a hold list that builds one text to Sean. */
+:root {
+  --bg: #e9e6df;          /* swept concrete */
+  --panel: #f6f4ef;       /* tag stock */
+  --ink: #1d1f1c;
+  --muted: #5f625b;
+  --line: #c9c4b8;
+  --peg: #d3ccbc;
+  --peg-hole: #ada38e;
+  --hivis: #f3c316;       /* hi-vis tag yellow */
+  --hivis-ink: #1d1f1c;
+  --rust: #b4471b;
+  --ok: #2f7a43;
+  /* the garage hero stays at night in both themes */
+  --night: #121310;
+  --night-2: #1c1d19;
+  --night-fg: #efede6;
+  --night-muted: #a7a89e;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171815; --panel: #22231f; --ink: #ecebe5; --muted: #a3a49b; --line: #3a3b35;
+    --peg: #2b2a24; --peg-hole: #12120f; --rust: #e0703d; --ok: #5cb874; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171815; --panel: #22231f; --ink: #ecebe5; --muted: #a3a49b; --line: #3a3b35;
+  --peg: #2b2a24; --peg-hole: #12120f; --rust: #e0703d; --ok: #5cb874; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: .92; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--hivis); outline-offset: 2px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+button { font: inherit; }
+
+/* top bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--night) 88%, transparent); backdrop-filter: blur(8px); color: var(--night-fg); border-bottom: 1px solid #ffffff14; }
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 10px; }
+.logo { font-family: var(--display); font-weight: 900; font-size: 22px; letter-spacing: .02em; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.logo b { background: var(--hivis); color: var(--hivis-ink); padding: 0 6px; }
+.bar nav { display: flex; gap: 18px; font-size: 14px; font-weight: 500; align-items: center; }
+.bar nav a { text-decoration: none; opacity: .8; }
+.bar nav a:hover { opacity: 1; }
+.holdbtn { background: var(--hivis); color: var(--hivis-ink); border: 0; padding: 6px 10px; font: 700 13px var(--mono); cursor: pointer; }
+
+/* hero */
+.hero { position: relative; background: radial-gradient(120% 90% at 70% 10%, #3a3420 0%, var(--night-2) 38%, var(--night) 70%); color: var(--night-fg); overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle, #ffffff10 1.6px, transparent 2px); background-size: 22px 22px; pointer-events: none; }
+.hero .wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 24px; align-items: center; padding-block: 40px 28px; min-height: 560px; }
+.hero h1 { font-size: clamp(52px, 7.2vw, 100px); font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; }
+.hero h1 .l { display: block; overflow: hidden; }
+.hero h1 .l span { display: inline-block; }
+.hero h1 .y { color: var(--hivis); }
+@media (prefers-reduced-motion: no-preference) {
+  .hero h1 .l span { animation: rise .8s cubic-bezier(.2,.8,.2,1) both; }
+  .hero h1 .l:nth-child(2) span { animation-delay: .12s; }
+  @keyframes rise { from { transform: translateY(100%); } to { transform: none; } }
+}
+.lede { max-width: 44ch; font-size: 18px; color: var(--night-muted); margin: 18px 0 22px; }
+.lede b { color: var(--night-fg); font-weight: 600; }
+.ctas { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: 700 15px var(--body); padding: 12px 16px; border: 2px solid var(--hivis); background: var(--hivis); color: var(--hivis-ink); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.btn.ghost { background: transparent; color: var(--night-fg); border-color: #ffffff55; }
+.btn.ghost:hover { border-color: var(--hivis); }
+.stage { position: relative; height: min(62vh, 560px); min-height: 380px; }
+#pallet { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; -webkit-mask-image: radial-gradient(ellipse 60% 58% at 50% 55%, #000 55%, transparent 100%); mask-image: radial-gradient(ellipse 60% 58% at 50% 55%, #000 55%, transparent 100%); }
+#pallet.grabbing { cursor: grabbing; }
+.stage-ui { position: absolute; left: 0; right: 0; bottom: 6px; display: flex; justify-content: space-between; align-items: end; gap: 10px; pointer-events: none; flex-wrap: wrap; }
+.stage-ui > * { pointer-events: auto; }
+.hint { font: 500 12px var(--mono); color: var(--night-muted); letter-spacing: .06em; }
+.peek { position: absolute; pointer-events: none; transform: translate(-50%, -120%); background: var(--panel); color: var(--ink); border: 2px solid var(--hivis); padding: 8px 10px; font-size: 13px; min-width: 160px; max-width: 220px; display: none; z-index: 2; }
+.peek b { display: block; font-family: var(--display); font-size: 24px; line-height: 1; }
+.peek small { font-family: var(--mono); color: var(--muted); font-size: 11px; letter-spacing: .06em; }
+.fallback { position: absolute; inset: 10% 8%; display: none; place-items: center; border: 2px dashed #ffffff33; font-family: var(--display); font-size: 40px; text-transform: uppercase; color: var(--night-muted); }
+
+/* drop strip */
+.drop { background: var(--hivis); color: var(--hivis-ink); border-block: 3px solid var(--night); }
+.drop .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding-block: 12px; }
+.drop strong { font-family: var(--display); font-size: 26px; text-transform: uppercase; }
+.clock { display: flex; gap: 8px; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.clock span { background: var(--night); color: var(--hivis); padding: 4px 8px; font-size: 20px; font-weight: 600; min-width: 3.1ch; text-align: center; }
+.clock em { font-style: normal; font-size: 10px; display: block; color: var(--night-muted); letter-spacing: .1em; }
+.ticker { overflow: hidden; background: var(--night); color: var(--night-fg); border-bottom: 3px solid var(--night); }
+.ticker .track { display: flex; gap: 40px; width: max-content; padding-block: 10px; font: 500 13px var(--mono); letter-spacing: .05em; text-transform: uppercase; }
+.ticker .track span b { color: var(--hivis); margin-right: 8px; }
+@media (prefers-reduced-motion: no-preference) { .ticker .track { animation: tick 48s linear infinite; } .ticker:hover .track { animation-play-state: paused; } @keyframes tick { to { transform: translateX(-50%); } } }
+
+/* shop */
+section { padding-block: 64px; }
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 22px; }
+.head h2 { font-size: clamp(44px, 6.5vw, 76px); text-transform: uppercase; font-weight: 900; }
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 24px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 600 13px var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 8px 12px; border: 2px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.chip i { font-style: normal; opacity: .6; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.chip:hover:not([aria-pressed="true"]) { background: var(--hivis); color: var(--hivis-ink); }
+.search { flex: 1 1 220px; min-width: 0; display: flex; }
+#q, #sort { font: 500 15px var(--body); padding: 9px 12px; border: 2px solid var(--ink); background: var(--panel); color: var(--ink); }
+#q { width: 100%; min-width: 0; }
+.count { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; perspective: 1000px; }
+.item { background: var(--panel); border: 2px solid var(--ink); display: flex; flex-direction: column; text-align: left; padding: 0; color: var(--ink); position: relative; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d; }
+.item:hover { box-shadow: 6px 6px 0 var(--ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .item { transition: transform .15s ease-out, box-shadow .15s; }
+  .grid.anim .item { animation: deal .45s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i) * 40ms); }
+  @keyframes deal { from { transform: translateY(18px) rotate(-1.5deg); } to { transform: none; } }
+}
+.open { all: unset; cursor: pointer; display: flex; flex-direction: column; flex: 1; }
+.open:focus-visible { outline: 3px solid var(--hivis); outline-offset: -3px; }
+.photo { aspect-ratio: 4 / 3; max-width: 100%; width: 100%; display: grid; place-items: center; border-bottom: 2px solid var(--ink); background-color: var(--peg); background-image: radial-gradient(circle, var(--peg-hole) 1.6px, transparent 2px); background-size: 16px 16px; position: relative; overflow: hidden; }
+.photo .boxart { width: 46%; aspect-ratio: 1.2; background: linear-gradient(90deg, transparent 44%, #d9c39066 44% 56%, transparent 56%), #c49a63; border: 2px solid #6b4f2b; display: grid; place-items: end center; padding-bottom: 8%; box-shadow: 0 10px 0 -4px #00000022; }
+.photo .boxart span { font: 600 10px var(--mono); background: #f6f4ef; color: #1d1f1c; padding: 2px 5px; letter-spacing: .06em; }
+.photo img { width: 100%; height: 100%; object-fit: cover; }
+.tag { padding: 12px 14px 14px; display: grid; gap: 6px; flex: 1; }
+.tag .lot { display: flex; justify-content: space-between; gap: 8px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.tag h3 { font-family: var(--body); font-weight: 700; font-size: 17px; line-height: 1.25; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tag .row { margin-top: auto; padding-top: 6px; }
+.price { font-family: var(--display); font-weight: 900; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.price s { font-size: 18px; color: var(--muted); font-weight: 600; margin-left: 6px; }
+.grade { font: 600 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 8px; border: 2px solid currentColor; white-space: nowrap; }
+.g-new { color: var(--ok); } .g-open { color: var(--ink); } .g-used { color: var(--muted); } .g-asis { color: var(--rust); }
+.save { border: 0; border-top: 2px solid var(--ink); background: transparent; color: var(--ink); padding: 10px 14px; font: 600 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; text-align: left; display: flex; justify-content: space-between; }
+.save:hover { background: var(--hivis); color: var(--hivis-ink); }
+.save[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.flag { position: absolute; top: 10px; left: 10px; z-index: 1; display: flex; gap: 6px; }
+.flag span { font: 600 10px var(--mono); letter-spacing: .1em; background: var(--hivis); color: var(--hivis-ink); padding: 3px 6px; border: 1.5px solid var(--hivis-ink); }
+.flag span.off { background: var(--rust); color: #fff; border-color: var(--rust); }
+.empty { padding: 40px; text-align: center; border: 2px dashed var(--line); color: var(--muted); grid-column: 1 / -1; }
+
+/* grading */
+.grading { border-top: 6px solid var(--ink); }
+.scale { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 2px solid var(--ink); background: var(--panel); }
+.scale button { all: unset; cursor: pointer; padding: 18px; border-right: 2px solid var(--ink); display: grid; gap: 8px; align-content: start; }
+.scale button:last-child { border-right: 0; }
+.scale button:hover, .scale button[aria-pressed="true"] { background: var(--bg); }
+.scale button:focus-visible { outline: 3px solid var(--hivis); outline-offset: -3px; }
+.scale p { margin: 0; color: var(--muted); font-size: 15px; }
+.scale small { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .06em; }
+
+/* how to buy */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; counter-reset: s; }
+.step { border-top: 6px solid var(--hivis); padding-top: 14px; }
+.step h3 { font-size: 32px; text-transform: uppercase; display: flex; gap: 12px; align-items: baseline; }
+.step h3::before { counter-increment: s; content: counter(s); font-family: var(--mono); font-size: 14px; background: var(--ink); color: var(--bg); padding: 2px 8px; }
+.step p { margin: 8px 0 0; max-width: 40ch; }
+
+/* contact */
+.contact { background: var(--night); color: var(--night-fg); }
+.contact .wrap { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+.contact h2 { font-size: clamp(48px, 7.5vw, 92px); text-transform: uppercase; color: var(--hivis); }
+.contact p { max-width: 50ch; color: var(--night-muted); }
+.card { background: var(--night-2); border: 2px solid var(--hivis); padding: 20px; display: grid; gap: 12px; }
+.card .eyebrow { color: var(--night-muted); }
+.card strong { font-family: var(--display); font-size: 40px; font-weight: 800; line-height: 1; user-select: all; }
+.toast { font-family: var(--mono); font-size: 12px; color: var(--ok); min-height: 1em; }
+.contact .toast { color: var(--hivis); }
+footer { padding-block: 22px 96px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* hold list drawer */
+.holdbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; background: var(--night); color: var(--night-fg); border-top: 3px solid var(--hivis); padding-bottom: env(safe-area-inset-bottom, 0px); transform: translateY(110%); }
+.holdbar.on { transform: none; }
+@media (prefers-reduced-motion: no-preference) { .holdbar { transition: transform .3s cubic-bezier(.2,.8,.2,1); } }
+.holdbar .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding-block: 12px; }
+.holdbar .sum { font-family: var(--mono); font-size: 14px; }
+.holdbar .sum b { font-family: var(--display); font-size: 26px; color: var(--hivis); margin-left: 6px; }
+.holdbar .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.holdbar .btn { padding: 9px 12px; font-size: 14px; }
+
+/* item sheet */
+dialog { border: 3px solid var(--ink); padding: 0; max-width: min(720px, calc(100vw - 32px)); width: 100%; background: var(--panel); color: var(--ink); }
+dialog::backdrop { background: rgb(0 0 0 / .6); backdrop-filter: blur(3px); }
+.sheet { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.sheet .photo { aspect-ratio: auto; min-height: 280px; border-bottom: 0; border-right: 3px solid var(--ink); }
+.sheet .body { padding: 20px; display: grid; gap: 10px; align-content: start; }
+.sheet h3 { font-family: var(--body); font-size: 22px; font-weight: 700; line-height: 1.2; padding-right: 30px; }
+.sheet .desc { margin: 0; color: var(--muted); }
+.sheet label { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: grid; gap: 4px; }
+.sheet input { font: 600 16px var(--body); padding: 8px 10px; border: 2px solid var(--ink); background: var(--bg); color: var(--ink); width: 100%; }
+.msg { font-family: var(--mono); font-size: 13px; background: var(--bg); padding: 10px; border: 1px dashed var(--line); white-space: pre-wrap; user-select: all; }
+.sheet .btn.ghost, dialog .btn.ghost { color: var(--ink); border-color: var(--ink); }
+.x { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; font-size: 20px; border: 2px solid var(--ink); background: var(--panel); color: var(--ink); cursor: pointer; z-index: 2; }
+
+@media (max-width: 860px) {
+  .hero .wrap { grid-template-columns: minmax(0, 1fr); min-height: 0; padding-block: 28px 16px; }
+  .stage { height: 380px; min-height: 0; order: -1; margin-inline: -8px; }
+  .contact .wrap { grid-template-columns: minmax(0, 1fr); }
+  .scale { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .scale button:nth-child(2) { border-right: 0; }
+  .scale button:nth-child(-n+2) { border-bottom: 2px solid var(--ink); }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .sheet { grid-template-columns: minmax(0, 1fr); }
+  .sheet .photo { border-right: 0; border-bottom: 3px solid var(--ink); min-height: 200px; }
+}
+@media (max-width: 560px) { .bar nav a { display: none; } .clock span { font-size: 17px; } }
+</style>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="#top"><b>AG</b> Assimilated Garage</a>
+    <nav><a href="#shop">Shop</a><a href="#grading">Condition</a><a href="#buy">How to buy</a><a href="#contact">Contact</a><button class="holdbtn" type="button" id="holdTop">Hold list · <span id="holdCountTop">0</span></button></nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow" style="color:var(--night-muted)">Pallet finds · parts · hardware · everything else</div>
+        <h1><span class="l"><span>Assimilated</span></span><span class="l"><span class="y">Garage</span></span></h1>
+        <p class="lede"><b>Sean Hopkins buys liquidation pallets and opens every box by hand.</b> Parts, hardware, tools, home goods and electronics, all graded and priced to move.</p>
+        <div class="ctas">
+          <a class="btn" href="#shop">Shop the shelf</a>
+          <button class="btn ghost" type="button" id="crack">Open the pallet</button>
+        </div>
+      </div>
+      <div class="stage" id="stage">
+        <canvas id="pallet" aria-label="3D pallet of boxes. Open it and tap a box to see the item inside."></canvas>
+        <div class="peek" id="peek"></div>
+        <div class="fallback" id="fallback">Pallet 07</div>
+        <div class="stage-ui"><span class="hint" id="hint">DRAG TO TURN · TAP “OPEN THE PALLET”</span><span class="hint">PALLET 07 · <span id="palCount">0</span> BOXES</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drop" aria-live="off">
+    <div class="wrap">
+      <strong>Next pallet drop</strong>
+      <span class="eyebrow" style="color:var(--hivis-ink)" id="dropWhen"></span>
+      <div class="clock" id="clock"></div>
+    </div>
+  </div>
+  <div class="ticker" aria-hidden="true"><div class="track" id="track"></div></div>
+
+  <section id="shop">
+    <div class="wrap">
+      <div class="head">
+        <h2>On the shelf</h2>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="tools" role="toolbar" aria-label="Filter items">
+        <div class="chips" id="chips"></div>
+        <div class="search"><input id="q" type="search" placeholder="Search: drill, bolts, faucet…" aria-label="Search items"></div>
+        <select id="sort" aria-label="Sort items">
+          <option value="new">Newest pallet</option>
+          <option value="low">Price: low to high</option>
+          <option value="high">Price: high to low</option>
+          <option value="deal">Biggest markdown</option>
+        </select>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section id="grading" class="grading">
+    <div class="wrap">
+      <div class="head"><h2>Condition grades</h2><span class="eyebrow">Tap a grade to filter the shelf</span></div>
+      <div class="scale" id="scale">
+        <button type="button" data-g="new" aria-pressed="false"><span class="grade g-new">New</span><p>Sealed or never used. In the original packaging.</p><small data-n="new"></small></button>
+        <button type="button" data-g="open" aria-pressed="false"><span class="grade g-open">Open box</span><p>Box opened, item unused or tested once. Parts checked.</p><small data-n="open"></small></button>
+        <button type="button" data-g="used" aria-pressed="false"><span class="grade g-used">Used</span><p>Works as it should. Normal wear, noted in the listing.</p><small data-n="used"></small></button>
+        <button type="button" data-g="asis" aria-pressed="false"><span class="grade g-asis">As-is</span><p>For parts or repair. Priced that way, sold that way.</p><small data-n="asis"></small></button>
+      </div>
+    </div>
+  </section>
+
+  <section id="buy">
+    <div class="wrap">
+      <div class="head"><h2>How to buy</h2></div>
+      <div class="steps">
+        <div class="step"><h3>Build a hold list</h3><p>Tap “Hold this” on anything you want. Your list turns into one text to Sean.</p></div>
+        <div class="step"><h3>Sean holds it</h3><p>Send the text. Once he confirms, your items are held for 24 hours.</p></div>
+        <div class="step"><h3>Pick up or ship</h3><p>Grab it locally or have it shipped. Pay cash, Venmo, Zelle or Cash App.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="wrap">
+      <div>
+        <h2>Looking for something?</h2>
+        <p>Tell Sean what you need. If it isn’t on the shelf, it might be on the next pallet.</p>
+      </div>
+      <div class="card">
+        <span class="eyebrow">Text or call Sean</span>
+        <strong id="phone"></strong>
+        <div class="row" style="justify-content:flex-start;flex-wrap:wrap;gap:8px">
+          <button class="btn" id="copyPhone" type="button">Copy number</button>
+          <a class="btn ghost" id="callLink" href="#">Call</a>
+        </div>
+        <div class="toast" id="toast" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span>© 2026 Assimilated Garage · Sean Hopkins</span><span>assimilatedgarage.com</span></div></footer>
+
+<div class="holdbar" id="holdbar" role="region" aria-label="Hold list">
+  <div class="wrap">
+    <div class="sum"><span id="holdCount">0 items</span> on hold <b id="holdTotal">$0</b></div>
+    <div class="acts">
+      <button class="btn ghost" type="button" id="holdView">Review list</button>
+      <button class="btn" type="button" id="holdSend">Text it to Sean</button>
+    </div>
+  </div>
+</div>
+
+<dialog id="sheet" aria-labelledby="sheetTitle">
+  <button class="x" type="button" data-close aria-label="Close">×</button>
+  <div class="sheet">
+    <div class="photo" id="sheetPhoto"></div>
+    <div class="body">
+      <div class="eyebrow" id="sheetLot"></div>
+      <h3 id="sheetTitle"></h3>
+      <div class="row"><span class="price" id="sheetPrice"></span><span id="sheetGrade"></span></div>
+      <p class="desc" id="sheetDesc"></p>
+      <label for="offer">Your offer (optional)<input id="offer" type="number" inputmode="numeric" min="1" placeholder="$"></label>
+      <div class="msg" id="sheetMsg"></div>
+      <div class="row" style="justify-content:flex-start;flex-wrap:wrap;gap:8px">
+        <button class="btn" type="button" id="sheetHold">Hold this</button>
+        <button class="btn ghost" type="button" id="copyMsg">Copy message</button>
+        <a class="btn ghost" id="textLink" href="#">Open texts</a>
+      </div>
+      <div class="toast" id="sheetToast" aria-live="polite"></div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="listSheet" aria-labelledby="listTitle">
+  <button class="x" type="button" data-close aria-label="Close">×</button>
+  <div class="sheet" style="grid-template-columns:minmax(0,1fr)">
+    <div class="body">
+      <div class="eyebrow">Your hold list</div>
+      <h3 id="listTitle">Text this to Sean</h3>
+      <div class="msg" id="listMsg"></div>
+      <div class="eyebrow">Send to <span id="listPhone"></span></div>
+      <div class="row" style="justify-content:flex-start;flex-wrap:wrap;gap:8px">
+        <button class="btn" type="button" id="copyList">Copy message</button>
+        <a class="btn ghost" id="listText" href="#">Open texts</a>
+        <button class="btn ghost" type="button" id="clearList">Clear list</button>
+      </div>
+      <div class="toast" id="listToast" aria-live="polite"></div>
+    </div>
+  </div>
+</dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ---------------- Sean's details ----------------
+const PHONE = "(858) 336-4943";
+const DROP_DAY = 6, DROP_HOUR = 9;            // next pallet drop: Saturday 9 AM (Sean to confirm)
+const SAMPLE = true;                          // flip to false once real items + photos are in
+
+// SAMPLE inventory to show the layout. Replace with Sean's real items (photo: "images/xxx.jpg").
+const ITEMS = [
+  { lot: "07-014", cat: "Tools", title: "Cordless drill/driver, 20V, 2 batteries + charger", price: 65, was: 129, grade: "open", desc: "Opened, tested once. Both batteries hold a charge. Case included." },
+  { lot: "07-022", cat: "Hardware", title: "Stainless hex bolt assortment, 480 pcs, M6–M10", price: 18, grade: "new", desc: "Sealed organizer case. Bolts, nuts and washers." },
+  { lot: "07-031", cat: "Parts", title: "Front brake pad set, ceramic (fits most mid-size sedans)", price: 22, was: 49, grade: "new", desc: "Sealed box. Text the lot number with your year/make/model and Sean will check fitment." },
+  { lot: "07-038", cat: "Home", title: "Pull-down kitchen faucet, brushed nickel", price: 45, was: 119, grade: "open", desc: "Box opened, faucet never installed. All hoses and the deck plate are there." },
+  { lot: "07-041", cat: "Electronics", title: "Wi-Fi mesh router, 2-pack", price: 55, grade: "used", desc: "Reset to factory settings and tested. Light scuffs on one unit." },
+  { lot: "07-046", cat: "Hardware", title: "Cabinet hinges, soft-close, 10-pack", price: 15, grade: "new", desc: "Full overlay, 35 mm cup. Sealed." },
+  { lot: "07-052", cat: "Home", title: "LED shop light, 4 ft, linkable, 2-pack", price: 28, was: 59, grade: "new", desc: "5000K daylight. Plug-in, with chains for hanging." },
+  { lot: "07-055", cat: "Electronics", title: "Bluetooth speaker, waterproof", price: 25, grade: "open", desc: "Opened, charged and tested. Cable included." },
+  { lot: "07-060", cat: "Tools", title: "Socket set, 1/4\" + 3/8\" drive, 94 pcs", price: 38, was: 79, grade: "new", desc: "Sealed blow-mold case. SAE and metric." },
+  { lot: "06-077", cat: "Tools", title: "Rolling tool chest, 5 drawer, red", price: 90, grade: "used", desc: "Small dent on the left side. Every drawer slides smooth. Local pickup only." },
+  { lot: "06-081", cat: "Parts", title: "Lawn mower carburetor (for parts)", price: 8, grade: "asis", desc: "Came off a returns pallet. Untested. Sold for parts or rebuild." },
+  { lot: "06-090", cat: "Misc", title: "Mystery box, 10 lb of mixed pallet items", price: 20, grade: "asis", desc: "Random pull from the latest pallet. No returns, half the fun." },
+];
+
+// ---------------- helpers ----------------
+const GRADES = { new: ["New", "g-new"], open: ["Open box", "g-open"], used: ["Used", "g-used"], asis: ["As-is", "g-asis"] };
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const digits = PHONE.replace(/\D/g, "");
+const money = n => "$" + n.toLocaleString("en-US");
+const photo = i => i.photo ? `<img src="${esc(i.photo)}" alt="${esc(i.title)}" loading="lazy">` : `<div class="boxart"><span>LOT ${esc(i.lot)}</span></div>`;
+const gradeTag = g => `<span class="grade ${GRADES[g][1]}">${GRADES[g][0]}</span>`;
+const priceHTML = i => `${money(i.price)}${i.was ? `<s>${money(i.was)}</s>` : ""}`;
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+function copy(text, out) {
+  const say = t => { $(out).textContent = t; clearTimeout(copy[out]); copy[out] = setTimeout(() => $(out).textContent = "", 2600); };
+  try { navigator.clipboard.writeText(text).then(() => say("Copied. Paste it into a text to " + PHONE + "."), () => say("Select the message above and copy it.")); }
+  catch (e) { say("Select the message above and copy it."); }
+}
+const smsHref = body => `sms:${digits}?&body=${encodeURIComponent(body)}`;
+
+$("phone").textContent = PHONE;
+$("listPhone").textContent = PHONE;
+$("callLink").href = "tel:" + digits;
+$("copyPhone").addEventListener("click", () => copy(PHONE, "toast"));
+
+// ---------------- next drop countdown ----------------
+function nextDrop() {
+  const n = new Date(), d = new Date(n);
+  d.setHours(DROP_HOUR, 0, 0, 0);
+  d.setDate(d.getDate() + ((DROP_DAY - d.getDay() + 7) % 7));
+  if (d <= n) d.setDate(d.getDate() + 7);
+  return d;
+}
+const drop = nextDrop();
+$("dropWhen").textContent = drop.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }) + " · " + drop.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+function tickClock() {
+  let s = Math.max(0, Math.floor((drop - new Date()) / 1000));
+  const parts = [[Math.floor(s / 86400), "DAYS"], [Math.floor(s % 86400 / 3600), "HRS"], [Math.floor(s % 3600 / 60), "MIN"], [s % 60, "SEC"]];
+  $("clock").innerHTML = parts.map(([v, l]) => `<span>${String(v).padStart(2, "0")}<em>${l}</em></span>`).join("");
+}
+tickClock(); setInterval(tickClock, 1000);
+
+// ---------------- ticker ----------------
+const tick = ITEMS.filter(i => i.lot.startsWith("07")).map(i => `<span><b>Just in</b>${esc(i.title.split(",")[0])} · ${money(i.price)}</span>`).join("");
+$("track").innerHTML = tick + tick;
+
+// ---------------- shelf ----------------
+const CATS = ["All", ...new Set(ITEMS.map(i => i.cat))];
+let cat = store.get("ag-cat", "All"); if (!CATS.includes(cat)) cat = "All";
+let grade = null;
+let hold = store.get("ag-hold", []).filter(l => ITEMS.some(i => i.lot === l));
+
+document.querySelectorAll("[data-n]").forEach(el => { const n = ITEMS.filter(i => i.grade === el.dataset.n).length; el.textContent = `${n} on the shelf`; });
+
+function chips() {
+  $("chips").innerHTML = CATS.map(c => {
+    const n = c === "All" ? ITEMS.length : ITEMS.filter(i => i.cat === c).length;
+    return `<button class="chip" type="button" aria-pressed="${c === cat}" data-cat="${esc(c)}">${esc(c)} <i>${n}</i></button>`;
+  }).join("");
+  document.querySelectorAll("#scale button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.g === grade)));
+}
+function render(anim) {
+  const q = $("q").value.trim().toLowerCase();
+  let list = ITEMS.filter(i => (cat === "All" || i.cat === cat) && (!grade || i.grade === grade) &&
+    (!q || (i.title + " " + i.desc + " " + i.lot + " " + i.cat).toLowerCase().includes(q)));
+  const s = $("sort").value;
+  list = list.slice().sort(s === "low" ? (a, b) => a.price - b.price : s === "high" ? (a, b) => b.price - a.price :
+    s === "deal" ? (a, b) => ((b.was || b.price) - b.price) - ((a.was || a.price) - a.price) : (a, b) => b.lot.localeCompare(a.lot));
+  $("count").textContent = `${list.length} of ${ITEMS.length} items${grade ? " · " + GRADES[grade][0] : ""}`;
+  const g = $("grid");
+  g.classList.toggle("anim", !!anim);
+  g.innerHTML = list.length ? list.map((i, n) => {
+    const off = i.was ? Math.round((1 - i.price / i.was) * 100) : 0;
+    const held = hold.includes(i.lot);
+    return `<article class="item" style="--i:${n}">
+      <div class="flag">${SAMPLE ? "<span>SAMPLE</span>" : ""}${off >= 40 ? `<span class="off">${off}% OFF</span>` : ""}</div>
+      <button class="open" type="button" data-lot="${esc(i.lot)}" aria-label="View ${esc(i.title)}">
+        <div class="photo">${photo(i)}</div>
+        <div class="tag">
+          <div class="lot"><span>Lot ${esc(i.lot)}</span><span>${esc(i.cat)}</span></div>
+          <h3>${esc(i.title)}</h3>
+          <div class="row"><span class="price">${priceHTML(i)}</span>${gradeTag(i.grade)}</div>
+        </div>
+      </button>
+      <button class="save" type="button" data-hold="${esc(i.lot)}" aria-pressed="${held}"><span>${held ? "On hold list" : "Hold this"}</span><span>${held ? "✓" : "+"}</span></button>
+    </article>`;
+  }).join("") : `<div class="empty">Nothing matches that yet. Text Sean and ask. It might be on the next pallet.</div>`;
+}
+chips(); render(true);
+
+$("chips").addEventListener("click", e => { const b = e.target.closest(".chip"); if (!b) return; cat = b.dataset.cat; store.set("ag-cat", cat); chips(); render(true); });
+$("scale").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  grade = grade === b.dataset.g ? null : b.dataset.g; chips(); render(true);
+  $("shop").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+});
+$("q").addEventListener("input", () => render(false));
+$("sort").addEventListener("change", () => render(true));
+
+// card tilt
+const fine = matchMedia("(hover: hover) and (prefers-reduced-motion: no-preference)").matches;
+if (fine) {
+  $("grid").addEventListener("pointermove", e => {
+    const c = e.target.closest(".item"); if (!c) return;
+    const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    c.style.setProperty("--ry", (x * 8).toFixed(2) + "deg"); c.style.setProperty("--rx", (-y * 8).toFixed(2) + "deg");
+  });
+  $("grid").addEventListener("pointerout", e => { const c = e.target.closest(".item"); if (c && !c.contains(e.relatedTarget)) { c.style.setProperty("--rx", "0deg"); c.style.setProperty("--ry", "0deg"); } });
+}
+
+// ---------------- hold list ----------------
+function holdMsg() {
+  const its = hold.map(l => ITEMS.find(i => i.lot === l));
+  const total = its.reduce((a, i) => a + i.price, 0);
+  return "Hi Sean, I'd like to hold these from Assimilated Garage:\n" + its.map(i => `• Lot ${i.lot}: ${i.title.split(",")[0]} (${money(i.price)})`).join("\n") + `\nTotal ${money(total)}. When can I pick up?`;
+}
+function syncHold() {
+  store.set("ag-hold", hold);
+  const its = hold.map(l => ITEMS.find(i => i.lot === l));
+  $("holdCount").textContent = `${its.length} item${its.length === 1 ? "" : "s"}`;
+  $("holdCountTop").textContent = its.length;
+  $("holdTotal").textContent = money(its.reduce((a, i) => a + i.price, 0));
+  $("holdbar").classList.toggle("on", its.length > 0);
+}
+function toggleHold(lot) { hold = hold.includes(lot) ? hold.filter(l => l !== lot) : [...hold, lot]; syncHold(); render(false); if (current && current.lot === lot) sheetHoldLabel(); }
+$("grid").addEventListener("click", e => {
+  const h = e.target.closest("[data-hold]"); if (h) return toggleHold(h.dataset.hold);
+  const o = e.target.closest(".open"); if (o) openItem(o.dataset.lot);
+});
+function openList() {
+  if (!hold.length) { $("shop").scrollIntoView(); return; }
+  const m = holdMsg(); $("listMsg").textContent = m; $("listText").href = smsHref(m); $("listToast").textContent = ""; $("listSheet").showModal();
+}
+$("holdView").addEventListener("click", openList);
+$("holdSend").addEventListener("click", openList);
+$("holdTop").addEventListener("click", openList);
+$("copyList").addEventListener("click", () => copy(holdMsg(), "listToast"));
+$("clearList").addEventListener("click", () => { hold = []; syncHold(); render(false); $("listSheet").close(); });
+syncHold();
+
+// ---------------- item sheet ----------------
+let current = null;
+function itemMsg() {
+  const o = parseInt($("offer").value, 10);
+  return `Hi Sean, is lot ${current.lot} (${current.title.split(",")[0]}, ${money(current.price)}) still available?` + (o > 0 ? ` Would you take ${money(o)}?` : "");
+}
+function sheetHoldLabel() { $("sheetHold").textContent = hold.includes(current.lot) ? "On hold list ✓" : "Hold this"; }
+function refreshMsg() { const m = itemMsg(); $("sheetMsg").textContent = m; $("textLink").href = smsHref(m); }
+function openItem(lot) {
+  const i = ITEMS.find(x => x.lot === lot); if (!i) return; current = i;
+  $("sheetPhoto").innerHTML = photo(i);
+  $("sheetLot").textContent = `Lot ${i.lot} · ${i.cat}${SAMPLE ? " · sample" : ""}`;
+  $("sheetTitle").textContent = i.title;
+  $("sheetPrice").innerHTML = priceHTML(i);
+  $("sheetGrade").innerHTML = gradeTag(i.grade);
+  $("sheetDesc").textContent = i.desc;
+  $("offer").value = ""; refreshMsg(); sheetHoldLabel();
+  $("sheetToast").textContent = "";
+  $("sheet").showModal();
+}
+$("offer").addEventListener("input", refreshMsg);
+$("sheetHold").addEventListener("click", () => toggleHold(current.lot));
+$("copyMsg").addEventListener("click", () => copy(itemMsg(), "sheetToast"));
+document.querySelectorAll("dialog").forEach(d => {
+  d.addEventListener("click", e => { if (e.target === d || e.target.closest("[data-close]")) d.close(); });
+});
+
+// ---------------- the pallet (three.js) ----------------
+(function pallet() {
+  const canvas = $("pallet"), stage = $("stage");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let renderer;
+  try { if (!window.THREE) throw 0; renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }); }
+  catch (e) { canvas.style.display = "none"; $("fallback").style.display = "grid"; $("crack").style.display = "none"; $("hint").textContent = ""; return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x121310, 5, 10);
+  const cam = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
+  const target = new THREE.Vector3(0, 0.55, 0);
+
+  // light: one hanging work light, a cool fill, a hi-vis rim
+  scene.add(new THREE.HemisphereLight(0x9aa3b0, 0x2a2318, 0.55));
+  const work = new THREE.SpotLight(0xffd9a0, 1.8, 12, Math.PI / 5, 0.45, 1.2);
+  work.position.set(0.6, 4.2, 1.2); work.target.position.set(0, 0.3, 0);
+  work.castShadow = true; work.shadow.mapSize.set(1024, 1024); work.shadow.bias = -0.0006; work.shadow.radius = 4;
+  scene.add(work, work.target);
+  const rim = new THREE.PointLight(0xf3c316, 0.9, 6); rim.position.set(-2.2, 1.4, -1.6); scene.add(rim);
+
+  // bulb + cord
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.06, 16, 12), new THREE.MeshBasicMaterial({ color: 0xfff0c8 }));
+  bulb.position.set(0.6, 3.3, 1.2); scene.add(bulb);
+  const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 2, 6), new THREE.MeshBasicMaterial({ color: 0x222222 }));
+  cord.position.set(0.6, 4.3, 1.2); scene.add(cord);
+
+  // floor
+  const floorTex = (() => {
+    const c = document.createElement("canvas"); c.width = c.height = 512; const g = c.getContext("2d");
+    g.fillStyle = "#3b3a35"; g.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 9000; i++) { const v = 40 + Math.random() * 40; g.fillStyle = `rgba(${v},${v},${v - 4},${Math.random() * .35})`; g.fillRect(Math.random() * 512, Math.random() * 512, 2, 2); }
+    g.strokeStyle = "#2a2925"; g.lineWidth = 3; g.beginPath(); g.moveTo(0, 256); g.lineTo(512, 256); g.stroke();
+    const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 5); t.encoding = THREE.sRGBEncoding; return t;
+  })();
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(24, 24), new THREE.MeshStandardMaterial({ map: floorTex, roughness: .92 }));
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+  // painted bay line
+  const bay = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.07), new THREE.MeshStandardMaterial({ color: 0xf3c316, roughness: .7 }));
+  bay.rotation.x = -Math.PI / 2; bay.position.set(0, 0.002, 1.25); scene.add(bay);
+
+  // pallet: 3 stringers + 7 deck boards + 3 bottom boards (48x40 GMA, scaled to 1.2 x 1.0)
+  const woodMat = shade => new THREE.MeshStandardMaterial({ color: new THREE.Color(0xb88d5a).offsetHSL(0, 0, shade), roughness: .85 });
+  const board = (w, h, d, x, y, z, m) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); b.castShadow = b.receiveShadow = true; scene.add(b); };
+  [-0.55, 0, 0.55].forEach(z => board(1.22, 0.022, 0.1, 0, 0.011, z, woodMat(-.06)));
+  [-0.46, 0, 0.46].forEach(z => board(1.22, 0.09, 0.04, 0, 0.067, z * 1.08, woodMat(-.1)));
+  for (let k = 0; k < 7; k++) board(0.15, 0.022, 1.02, -0.53 + k * 0.177, 0.123, 0, woodMat((k % 3 - 1) * .03));
+  const DECK = 0.134;
+
+  // boxes: kraft cardboard with tape + a lot label
+  function boxTex(lot, n) {
+    const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d");
+    const hue = 30 + (n % 3) * 2; g.fillStyle = `hsl(${hue} 42% ${50 + (n % 4) * 2}%)`; g.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 1600; i++) { g.fillStyle = `rgba(80,50,20,${Math.random() * .08})`; g.fillRect(Math.random() * 256, Math.random() * 256, 1 + Math.random() * 3, 1); }
+    g.fillStyle = "rgba(225,200,150,.75)"; g.fillRect(108, 0, 40, 256);                 // tape
+    g.fillStyle = "#f6f4ef"; g.fillRect(28, 150, 112, 70); g.strokeStyle = "#1d1f1c"; g.lineWidth = 3; g.strokeRect(28, 150, 112, 70);
+    g.fillStyle = "#f3c316"; g.fillRect(28, 150, 30, 70);
+    g.fillStyle = "#1d1f1c"; g.font = "700 22px 'Big Shoulders Display', Impact, sans-serif"; g.fillText("AG", 32, 192);
+    g.font = "600 15px 'IBM Plex Mono', monospace"; g.fillText("LOT", 64, 175); g.fillText(lot, 64, 200);
+    g.font = "600 14px 'IBM Plex Mono', monospace"; g.fillStyle = "rgba(30,25,20,.55)"; g.fillText("↑↑ THIS SIDE UP", 150, 40);
+    const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t;
+  }
+  // stack plan: [x, z, w, h, d, sitsOn]
+  const plan = [
+    [-0.3, -0.25, 0.58, 0.36, 0.48, -1], [0.3, -0.25, 0.58, 0.36, 0.48, -1], [-0.3, 0.25, 0.58, 0.36, 0.48, -1], [0.3, 0.25, 0.58, 0.36, 0.48, -1],
+    [-0.29, -0.24, 0.52, 0.3, 0.44, 0], [0.31, -0.22, 0.5, 0.26, 0.46, 1], [-0.27, 0.26, 0.5, 0.28, 0.42, 2], [0.28, 0.27, 0.52, 0.32, 0.42, 3],
+    [-0.27, -0.2, 0.4, 0.22, 0.36, 4], [0.3, 0.24, 0.38, 0.2, 0.34, 7], [0.06, 0.02, 0.34, 0.16, 0.3, 8],
+  ];
+  const boxes = [];
+  plan.forEach((p, n) => {
+    const it = ITEMS[n % ITEMS.length];
+    const tex = boxTex(it.lot, n);
+    const side = new THREE.MeshStandardMaterial({ map: tex, roughness: .9 });
+    const top = new THREE.MeshStandardMaterial({ color: new THREE.Color(0xa8804f).offsetHSL(0, 0, (n % 3) * .015), roughness: .9 });
+    const m = new THREE.Mesh(new THREE.BoxGeometry(p[2], p[3], p[4]), [side, side, top, top, side, side]);
+    m.castShadow = m.receiveShadow = true;
+    const baseY = p[5] < 0 ? DECK : boxes[p[5]].home.y + plan[p[5]][3] / 2;
+    const home = new THREE.Vector3(p[0], baseY + p[3] / 2, p[1]);
+    const yaw = (Math.random() - .5) * 0.12;
+    m.position.copy(home); m.rotation.y = yaw;
+    m.userData = { lot: it.lot, item: it };
+    scene.add(m);
+    boxes.push({ m, home, yaw, h: p[3], delay: n * 0.07, spinDir: n % 2 ? 1 : -1 });
+  });
+  $("palCount").textContent = boxes.length;
+  // open layout: a fanned arc in front of the pallet
+  boxes.forEach((b, n) => {
+    const k = n / (boxes.length - 1), a = -1.15 + k * 2.3;
+    b.open = new THREE.Vector3(Math.sin(a) * 1.75, 0.5 + Math.sin(k * Math.PI) * 0.55 + (n % 2) * 0.22, Math.cos(a) * 1.05 + 0.2);
+  });
+
+  // camera orbit
+  let theta = 0.62, phi = 0.36, dist = 4.6, dragging = false, lastX = 0, vel = 0, idle = 0;
+  function placeCam() {
+    cam.position.set(target.x + dist * Math.sin(theta) * Math.cos(phi), target.y + dist * Math.sin(phi) + 0.3, target.z + dist * Math.cos(theta) * Math.cos(phi));
+    cam.lookAt(target);
+  }
+  canvas.addEventListener("pointerdown", e => { dragging = true; lastX = e.clientX; downX = e.clientX; downY = e.clientY; canvas.classList.add("grabbing"); canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener("pointerup", e => { dragging = false; canvas.classList.remove("grabbing"); if (Math.abs(e.clientX - downX) < 6 && Math.abs(e.clientY - downY) < 6) pick(e, true); });
+  let downX = 0, downY = 0;
+  canvas.addEventListener("pointermove", e => {
+    if (dragging) { const dx = e.clientX - lastX; lastX = e.clientX; theta -= dx * 0.008; vel = -dx * 0.008; idle = 0; }
+    else if (e.pointerType === "mouse") pick(e, false);
+  });
+  canvas.addEventListener("pointerleave", () => { $("peek").style.display = "none"; hovered = null; });
+
+  // picking
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  let hovered = null;
+  function pick(e, click) {
+    const r = canvas.getBoundingClientRect();
+    ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, cam);
+    const hit = ray.intersectObjects(boxes.map(b => b.m))[0];
+    const peek = $("peek");
+    if (!hit) { peek.style.display = "none"; hovered = null; canvas.style.cursor = ""; return; }
+    const it = hit.object.userData.item;
+    if (click) { if (openT > .5) openItem(it.lot); else setOpen(true); return; }
+    hovered = hit.object; canvas.style.cursor = "pointer";
+    peek.innerHTML = openT > .5 ? `<small>LOT ${esc(it.lot)}</small><b>${money(it.price)}</b>${esc(it.title.split(",")[0])}` : `<small>LOT ${esc(it.lot)}</small>Tap to open the pallet`;
+    peek.style.left = (e.clientX - r.left) + "px"; peek.style.top = (e.clientY - r.top) + "px"; peek.style.display = "block";
+  }
+
+  // open / close
+  let openT = 0, openGoal = 0;
+  function setOpen(v) {
+    openGoal = v ? 1 : 0;
+    $("crack").textContent = v ? "Pack it back up" : "Open the pallet";
+    $("hint").textContent = v ? "TAP A BOX TO SEE WHAT’S INSIDE" : "DRAG TO TURN · TAP “OPEN THE PALLET”";
+  }
+  $("crack").addEventListener("click", () => setOpen(openGoal === 0));
+
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false); cam.aspect = w / h;
+    dist = w < 520 ? 5.6 : 4.6; cam.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage); resize();
+
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const bounce = t => { const n = 7.5625, d = 2.75; if (t < 1 / d) return n * t * t; if (t < 2 / d) return n * (t -= 1.5 / d) * t + .75; if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + .9375; return n * (t -= 2.625 / d) * t + .984375; };
+
+  let visible = true;
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(stage);
+  const clock = new THREE.Clock();
+  let t0 = reduce ? 99 : 0;
+  function frame() {
+    requestAnimationFrame(frame);
+    if (!visible) return;
+    const raw = clock.getDelta(), dt = Math.min(raw, 0.05); t0 += Math.min(raw, 0.25); idle += dt;
+    if (!dragging) { theta += vel; vel *= 0.92; if (!reduce && idle > 2.5) theta += dt * 0.12; }
+    openT += (openGoal - openT) * Math.min(1, dt * (reduce ? 60 : 3.2));
+    const k = ease(Math.min(1, Math.max(0, openT)));
+    boxes.forEach((b, n) => {
+      // drop-in on load
+      const dropT = Math.min(1, Math.max(0, (t0 - b.delay) / 0.75));
+      const fall = (1 - bounce(dropT)) * (2.6 + n * 0.08);
+      const p = b.m.position;
+      p.lerpVectors(b.home, b.open, k); p.y += fall;
+      if (k > 0.01) p.y += Math.sin(t0 * 1.6 + n) * 0.025 * k;
+      b.m.rotation.y = b.yaw + k * (Math.atan2(cam.position.x - p.x, cam.position.z - p.z) - b.yaw) * 0.85;
+      b.m.rotation.z = k * Math.sin(t0 * 1.1 + n) * 0.04;
+      const s = hovered === b.m ? 1.06 : 1; b.m.scale.lerp(new THREE.Vector3(s, s, s), 0.2);
+    });
+    bulb.position.x = 0.6 + Math.sin(t0 * 0.7) * 0.02; work.position.x = bulb.position.x;
+    placeCam(); renderer.render(scene, cam);
+  }
+  // fonts first so the box labels draw in the right face
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => boxes.forEach(b => {
+    const tex = boxTex(b.m.userData.lot, boxes.indexOf(b)); b.m.material[0].map = tex; b.m.material[0].needsUpdate = true;
+  }));
+  frame();
+})();
+</script>
