@@ -132,6 +132,17 @@ button, select { font: inherit; }
 .foot { border-top: 1px solid var(--line); padding-block: 24px 40px; color: var(--muted); font-size: 14px; }
 .foot .wrap { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; }
 .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--night); color: var(--night-fg); padding: 10px 14px; font: 600 13px var(--mono); z-index: 60; border: 1px solid var(--hivis); }
+.specs { display: grid; grid-template-columns: max-content 1fr; gap: 3px 10px; margin: 8px 0 2px; font-size: 13.5px; line-height: 1.4; }
+.specs dt { opacity: .6; } .specs dd { margin: 0; } .specs .thumbs img { width: 64px; height: 64px; object-fit: cover; margin-right: 4px; border-radius: 4px; }
+.all-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); margin-top: 16px; align-items: start; }
+.all-grid .card { color: var(--night-fg); align-content: start; }
+.all-grid .card .btn.ghost { color: var(--night-fg); }
+.yt { position: relative; display: block; width: 100%; max-width: 280px; margin-top: 2px; padding: 0; border: 0; border-radius: 6px; overflow: hidden; cursor: pointer; background: #000; aspect-ratio: 16 / 9; }
+.yt img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .85; }
+.yt-play { position: absolute; left: 50%; top: 50%; width: 54px; height: 38px; margin: -19px 0 0 -27px; border-radius: 9px; background: #c00; }
+.yt-play::after { content: ""; position: absolute; left: 22px; top: 11px; border-style: solid; border-width: 8px 0 8px 13px; border-color: transparent transparent transparent #fff; }
+.yt-cap { position: absolute; left: 8px; bottom: 6px; font: 600 11px/1 "IBM Plex Mono", monospace; color: #fff; text-shadow: 0 1px 2px #000; }
+.yt-frame { display: block; width: 100%; max-width: 280px; aspect-ratio: 16 / 9; border: 0; border-radius: 6px; margin-top: 2px; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -180,7 +191,7 @@ button, select { font: inherit; }
           <button class="btn" type="button" id="explode" aria-pressed="false">Open it up</button>
           <div style="display:grid;justify-items:end;gap:2px;text-align:right">
             <span class="hint" id="hint">DRAG TO TURN · TAP A PART</span>
-            <span class="demo-note">Tacoma-style demo model</span>
+            <span class="demo-note">3D model by Assimilated Garage</span>
           </div>
         </div>
       </div>
@@ -230,7 +241,19 @@ button, select { font: inherit; }
         <li><button type="button" data-spot="taillight_l">Taillight, driver side <span class="n"></span></button></li>
         <li><button type="button" data-spot="taillight_r">Taillight, passenger side <span class="n"></span></button></li>
         <li><button type="button" data-spot="bumper_rear">Rear bumper <span class="n"></span></button></li>
+        <li><button type="button" data-spot="running_board_l">Running board, driver side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="running_board_r">Running board, passenger side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="tonneau_cover">Tonneau cover <span class="n"></span></button></li>
       </ul>
+    </div>
+  </section>
+
+  <section class="list" id="all">
+    <div class="wrap">
+      <div class="eyebrow">All parts</div>
+      <h2>Everything Sean has listed</h2>
+      <p>Newest first, for any vehicle. Tap Text Sean to ask about one.</p>
+      <div class="all-grid" id="allParts"></div>
     </div>
   </section>
 </main>
@@ -268,6 +291,9 @@ const SPOTS = {
   taillight_l: { label: "Taillight, driver side", dir: [-1.3, 0.12, -0.12] },
   taillight_r: { label: "Taillight, passenger side", dir: [-1.3, 0.12, 0.12] },
   bumper_rear: { label: "Rear bumper", dir: [-1.4, -0.1, 0] },
+  running_board_l: { label: "Running board, driver side", dir: [0, 0, 0], arc: { r: 0.28, a0: -1.05, a1: 0.45, side: -1 } },
+  running_board_r: { label: "Running board, passenger side", dir: [0, 0, 0], arc: { r: 0.28, a0: -1.05, a1: 0.45, side: 1 } },
+  tonneau_cover: { label: "Tonneau cover", dir: [-0.85, 0.95, 0] },
 };
 const PAINTS = [
   { name: "Army green", hex: "#4b5340" },
@@ -275,6 +301,7 @@ const PAINTS = [
   { name: "Glacier white", hex: "#e4e4e0" },
   { name: "Midnight black", hex: "#17181a" },
   { name: "Hi-vis yellow", hex: "#d9ac12" },
+  { name: "Deep red", hex: "#8e1418" },
 ];
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (id) => document.getElementById(id);
@@ -322,8 +349,11 @@ const isTacoma = () => state.make === "Toyota" && /tacoma/i.test(state.model);
 
 // ---------------- inventory ----------------
 let ITEMS = [];
+// model names from NHTSA vary ("F-250" vs "F-250 Super Duty"), so compare loosely
+const norm = (m) => String(m).toLowerCase().replace(/[^a-z0-9]/g, "");
+const sameModel = (a, b) => { a = norm(a); b = norm(b); return !!a && !!b && (a === b || a.startsWith(b) || b.startsWith(a)); };
 const fits = (it) => !it.sold && (it.fitment === "universal" || (it.fitment || []).some((f) =>
-  state.year >= f.years[0] && state.year <= f.years[1] && f.make.toLowerCase() === state.make.toLowerCase() && f.model.toLowerCase() === state.model.toLowerCase()));
+  state.year >= f.years[0] && state.year <= f.years[1] && norm(f.make) === norm(state.make) && sameModel(f.model, state.model)));
 const spotsOf = (it) => [].concat(it.spot);
 const itemsFor = (spot) => ITEMS.filter((it) => fits(it) && spotsOf(it).includes(spot));
 
@@ -352,6 +382,63 @@ const ICON_TXT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON_CALL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg>`;
 const sms = (body) => `sms:${PHONE}?&body=${encodeURIComponent(body)}`;
 const panel = $("panel");
+const fitLine = (f) => `${f.years[0]}-${f.years[1]} ${f.make} ${f.model}${f.note ? " (" + f.note + ")" : ""}`;
+const fitText = (it) => it.fitment === "universal" ? "Fits most vehicles" : (it.fitment || []).map(fitLine).join("; ");
+const titleOf = (it) => [it.brand, it.part].filter(Boolean).join(" ") || it.title || "Part";
+const ytId = (u) => (String(u || "").match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/) || [])[1];
+const yn = (v) => v === true ? "Yes" : v === false ? "No" : "";
+const money = (n) => n != null ? "$" + Number(n).toLocaleString() : "Ask Sean";
+// listing details, always in this order (the template Sean sends); empty fields are skipped
+const FIELDS = [
+  ["brand", "Brand"], ["part", "Part"], ["partNumber", "Part number"], ["fitment", "Fits", fitText], ["size", "Size"],
+  ["condition", "Condition"], ["conditionNotes", "Condition notes"], ["damaged", "Damaged", yn], ["functional", "Functional", yn],
+  ["inPackaging", "In packaging", yn], ["missingParts", "Missing parts", yn], ["price", "Price", money], ["qty", "Qty available"], ["shipping", "Shipping"],
+  ["description", "Description"], ["video", "Video"], ["retailerLink", "Retailer page"], ["photos", "Photos"],
+];
+function details(it) {
+  return FIELDS.map(([k, label, fmt]) => {
+    const v = it[k];
+    if (v == null || v === "" || (Array.isArray(v) && !v.length)) return "";
+    if (k === "price" && it.price == null) return "";
+    if (k === "video") { const id = ytId(v); return id ? `<dt>${label}</dt><dd><button type="button" class="yt" data-yt="${id}" aria-label="Play product video"><img src="https://i.ytimg.com/vi/${id}/mqdefault.jpg" alt="" loading="lazy"><span class="yt-play" aria-hidden="true"></span></button></dd>` : ""; }
+    if (k === "retailerLink") return `<dt>${label}</dt><dd><a href="${esc(v)}" target="_blank" rel="noopener">Open</a></dd>`;
+    if (k === "photos") return v.length > 1 ? `<dt>${label}</dt><dd class="thumbs">${v.slice(1).map((ph) => `<img src="${esc(ph)}" alt="" loading="lazy">`).join("")}</dd>` : "";
+    const txt = fmt ? fmt(v) : v;
+    return txt === "" ? "" : `<dt>${label}</dt><dd>${esc(txt)}</dd>`;
+  }).join("");
+}
+function card(it, ctx = "") {
+  const call = `<a class="btn ghost" href="tel:${PHONE}">${ICON_CALL}Call</a>`;
+  const title = titleOf(it), photo = (it.photos || [])[0] || it.photo;
+  return `
+    <article class="card">
+      ${photo ? `<img class="ph" src="${esc(photo)}" alt="${esc(title)}" loading="lazy">` : PH}
+      <div>
+        ${it.sample ? `<span class="badge">Sample listing</span>` : ""}
+        <h3>${esc(title)}</h3>
+        <div class="meta"><span class="price">${it.price != null ? money(it.price) : "Price: ask Sean"}</span><span>${esc(it.condition || "")}</span>${it.qty != null && it.qty !== "" ? `<span>Qty available: ${esc(it.qty)}</span>` : ""}</div>
+        ${it.sample ? "" : `<dl class="specs">${details(it)}</dl>`}
+      </div>
+      <div class="acts">
+        <a class="btn" href="${sms(`Hi Sean, is the "${title}"${it.partNumber ? " (" + it.partNumber + ")" : ""} still available? ${ctx} (assimilatedgarage.com)`.replace("  ", " "))}">${ICON_TXT}Text Sean</a>
+        ${call}
+      </div>
+    </article>`;
+}
+// click-to-play: the YouTube iframe only loads after a tap
+document.addEventListener("click", (e) => {
+  const b = e.target.closest(".yt[data-yt]");
+  if (!b) return;
+  const f = document.createElement("iframe");
+  f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1&rel=0&playsinline=1`;
+  f.title = "Product video"; f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen"; f.allowFullscreen = true;
+  f.className = "yt-frame";
+  b.replaceWith(f);
+});
+function renderAll() {
+  const real = ITEMS.filter((it) => !it.sold && !it.sample).sort((a, b) => String(b.listed || "").localeCompare(String(a.listed || "")));
+  $("allParts").innerHTML = real.length ? real.map((it) => card(it)).join("") : `<p>New listings are on the way. Text Sean what you need.</p>`;
+}
 function resetPanel() {
   state.spot = null;
   $("pTitle").textContent = "Tap a part";
@@ -366,19 +453,7 @@ function showSpot(spot, openSheet = true) {
   $("pTitle").textContent = label;
   $("pCount").textContent = items.length ? `${items.length} in stock for this spot` : "Nothing in stock right now";
   const call = `<a class="btn ghost" href="tel:${PHONE}">${ICON_CALL}Call</a>`;
-  $("pBody").innerHTML = items.length ? items.map((it) => `
-    <article class="card">
-      ${it.photo ? `<img class="ph" src="${esc(it.photo)}" alt="${esc(it.title)}" loading="lazy">` : PH}
-      <div>
-        ${it.sample ? `<span class="badge">Sample listing</span>` : ""}
-        <h3>${esc(it.title)}</h3>
-        <div class="meta"><span class="price">${it.price != null ? "$" + Number(it.price).toLocaleString() : "Price: ask Sean"}</span><span>${esc(it.condition || "")}</span></div>
-      </div>
-      <div class="acts">
-        <a class="btn" href="${sms(`Hi Sean, is the "${it.title}" still available? It's for the ${label.toLowerCase()} on my ${v}. (assimilatedgarage.com)`)}">${ICON_TXT}Text Sean</a>
-        ${call}
-      </div>
-    </article>`).join("") : `
+  $("pBody").innerHTML = items.length ? items.map((it) => card(it, `It's for the ${label.toLowerCase()} on my ${v}.`)).join("") : `
     <div class="empty">
       <h3>Ask Sean to find it</h3>
       <p>He opens new pallets every week and knows where to look. Send him the part and your vehicle.</p>
@@ -414,13 +489,13 @@ async function start3D() {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.92;
+  renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.75;
+  scene.environmentIntensity = 1.0;
 
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
   const controls = new OrbitControls(camera, canvas);
@@ -453,29 +528,29 @@ async function start3D() {
   ring.rotation.x = -Math.PI / 2; ring.position.y = 0.002; scene.add(ring);
 
   // tuned materials by name (a swapped-in model keeps its own if names differ)
-  const paint = new THREE.MeshPhysicalMaterial({ color: PAINTS[0].hex, metalness: 0.3, roughness: 0.45, clearcoat: 0.8, clearcoatRoughness: 0.12 });
+  // the model carries its own PBR materials; these names get tuned here. Paint = metallic flake under a clearcoat.
+  const fl = document.createElement("canvas"); fl.width = fl.height = 128;
+  const fg = fl.getContext("2d"), fd = fg.createImageData(128, 128);
+  for (let k = 0; k < fd.data.length; k += 4) { fd.data[k] = 128 + (Math.random() - 0.5) * 90; fd.data[k + 1] = 128 + (Math.random() - 0.5) * 90; fd.data[k + 2] = 255; fd.data[k + 3] = 255; }
+  fg.putImageData(fd, 0, 0);
+  const flake = new THREE.CanvasTexture(fl); flake.wrapS = flake.wrapT = THREE.RepeatWrapping; flake.repeat.set(60, 60);
+  const paint = new THREE.MeshPhysicalMaterial({ color: PAINTS[0].hex, metalness: 0.55, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.04,
+    normalMap: flake, normalScale: new THREE.Vector2(0.12, 0.12) });
   const MATS = {
     paint,
-    trim_black: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.75 }),
-    gloss_black: new THREE.MeshPhysicalMaterial({ color: 0x060606, roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.05 }),
-    glass: new THREE.MeshPhysicalMaterial({ color: 0x0a0f13, roughness: 0.03, metalness: 0.1, transparent: true, opacity: 0.82, clearcoat: 1, envMapIntensity: 1.6 }),
-    tire: new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.93 }),
-    rim: new THREE.MeshStandardMaterial({ color: 0x8e9296, metalness: 1, roughness: 0.28 }),
-    rim_dark: new THREE.MeshStandardMaterial({ color: 0x1c1d1e, metalness: 0.6, roughness: 0.45 }),
-    chrome: new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 1, roughness: 0.12 }),
-    lamp_clear: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2, emissive: 0xf4f8ff, emissiveIntensity: 1.4 }),
-    lamp_lens: new THREE.MeshPhysicalMaterial({ color: 0x1b1e22, metalness: 0.5, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.02 }),
-    lamp_red: new THREE.MeshPhysicalMaterial({ color: 0x8c0f0f, roughness: 0.12, emissive: 0x6a0000, emissiveIntensity: 0.9, clearcoat: 1 }),
-    engine_metal: new THREE.MeshStandardMaterial({ color: 0x3c3e41, metalness: 0.8, roughness: 0.45 }),
-    engine_alu: new THREE.MeshStandardMaterial({ color: 0xa9acb0, metalness: 1, roughness: 0.32 }),
-    underbody: new THREE.MeshStandardMaterial({ color: 0x0b0b0b, roughness: 0.95 }),
+    glass: new THREE.MeshPhysicalMaterial({ color: 0x0b1014, roughness: 0.02, metalness: 0.1, transparent: true, opacity: 0.78, clearcoat: 1, envMapIntensity: 1.6 }),
+    lamp_glass: new THREE.MeshPhysicalMaterial({ color: 0xf4f7fa, roughness: 0.02, metalness: 0, transparent: true, opacity: 0.16, clearcoat: 1, depthWrite: false }),
+    tire: new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9 }),
+    chrome: new THREE.MeshStandardMaterial({ color: 0xe8e8e8, metalness: 1, roughness: 0.08 }),
   };
   // highlight + dim variants per base material, built lazily
   const HI = new Map(), DIM = new Map();
   const hi = (m) => { if (!HI.has(m)) { const c = m.clone(); c.emissive = new THREE.Color(0xf3c316); c.emissiveIntensity = m === paint || m.color.getHSL({}).l > 0.05 ? 0.38 : 0.55; HI.set(m, c); } return HI.get(m); };
   const dim = (m) => { if (!DIM.has(m)) { const c = m.clone(); c.transparent = true; c.opacity = m.transparent ? 0.14 : 0.22; c.depthWrite = false; DIM.set(m, c); } return DIM.get(m); };
 
-  const gltf = await new GLTFLoader().loadAsync("/models/tacoma-style.glb");
+  const { DRACOLoader } = await import("three/addons/loaders/DRACOLoader.js");
+  const draco = new DRACOLoader().setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/libs/draco/gltf/");
+  const gltf = await new GLTFLoader().setDRACOLoader(draco).loadAsync("/models/tacoma-style.glb");
   const truck = gltf.scene; scene.add(truck);
   const parts = {};
   truck.traverse((o) => {
@@ -489,7 +564,7 @@ async function start3D() {
   const spotOf = (o) => { while (o && !SPOTS[o.name]) o = o.parent; return o ? o.name : null; };
   for (const [name, o] of Object.entries(parts)) {
     o.userData.p0 = o.position.clone(); o.userData.q0 = o.quaternion.clone();
-    o.userData.dir = new THREE.Vector3(...SPOTS[name].dir); o.userData.rot = SPOTS[name].rot || [0, 0, 0];
+    o.userData.dir = new THREE.Vector3(...SPOTS[name].dir); o.userData.rot = SPOTS[name].rot || [0, 0, 0]; o.userData.arc = SPOTS[name].arc || null;
     o.traverse((m) => { if (m.isMesh) m.userData.spot = name; });
   }
 
@@ -527,8 +602,13 @@ async function start3D() {
   const tmpE = new THREE.Euler(), tmpQ = new THREE.Quaternion();
   function applyExplode(e) {
     for (const o of Object.values(parts)) {
-      const { p0, q0, dir, rot } = o.userData;
+      const { p0, q0, dir, rot, arc } = o.userData;
       o.position.copy(p0).addScaledVector(dir, e);
+      if (arc) {   // power step: swings down and out on its arms (parallelogram, stays level)
+        const f = arc.a0 + (arc.a1 - arc.a0) * e;
+        o.position.y -= arc.r * (Math.cos(f) - Math.cos(arc.a0));
+        o.position.z += arc.side * arc.r * (Math.sin(f) - Math.sin(arc.a0));
+      }
       tmpE.set(rot[0] * e, rot[1] * e, rot[2] * e); tmpQ.setFromEuler(tmpE);
       o.quaternion.copy(q0).multiply(tmpQ);
     }
@@ -590,7 +670,7 @@ async function start3D() {
     screenOf: (n) => { const v = new THREE.Vector3(); parts[n].getWorldPosition(v); v.project(camera); const r = canvas.getBoundingClientRect(); return [r.left + (v.x + 1) / 2 * r.width, r.top + (1 - v.y) / 2 * r.height]; } };
 }
 
-fetch("/data/parts.json").then((r) => r.json()).then((j) => { ITEMS = j.items || []; }).catch(() => {}).finally(loadModels);
+fetch("/data/parts.json").then((r) => r.json()).then((j) => { ITEMS = j.items || []; }).catch(() => {}).finally(() => { renderAll(); loadModels(); });
 </script>
 </body>
 </html>

@@ -1,17 +1,52 @@
 {
-  "_readme": "Sean's parts for /parts. One object per item. spot = the mesh name on the truck (see README). fitment = list of {years:[from,to], make, model} or the string \"universal\". price = number in dollars or null for 'ask Sean'. photo = path like /photos/abc.jpg or null. sold: true hides it. sample: true shows the 'Sample listing' badge; delete the sample items once real ones are in.",
-  "items": [
-    { "id": "sample-1", "sample": true, "spot": ["headlight_l"], "title": "Headlight assembly, driver side (SAMPLE)", "price": null, "condition": "Used, tested", "photo": null, "sold": false,
-      "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] },
-    { "id": "sample-2", "sample": true, "spot": ["tailgate"], "title": "Tailgate shell, needs paint (SAMPLE)", "price": null, "condition": "Used", "photo": null, "sold": false,
-      "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] },
-    { "id": "sample-3", "sample": true, "spot": ["mirror_r"], "title": "Power side mirror, passenger side (SAMPLE)", "price": null, "condition": "Open box", "photo": null, "sold": false,
-      "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] },
-    { "id": "sample-4", "sample": true, "spot": ["wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr"], "title": "Set of four 16 inch alloy wheels, 6 lug (SAMPLE)", "price": null, "condition": "Used", "photo": null, "sold": false,
-      "fitment": [{ "years": [2005, 2023], "make": "Toyota", "model": "Tacoma" }] },
-    { "id": "sample-5", "sample": true, "spot": ["grille"], "title": "Front grille, black (SAMPLE)", "price": null, "condition": "New, open box", "photo": null, "sold": false,
-      "fitment": [{ "years": [2018, 2023], "make": "Toyota", "model": "Tacoma" }] },
-    { "id": "sample-6", "sample": true, "spot": ["taillight_l", "taillight_r"], "title": "LED taillight pair (SAMPLE)", "price": null, "condition": "New", "photo": null, "sold": false,
-      "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] }
-  ]
+ "_readme": "Sean's parts for /parts. One object per listing, fields in the fixed order shown on the site (see README 'Listing template'). spot = mesh name(s) on the truck. fitment = list of {years:[from,to], make, model, note} or the string \"universal\". damaged / functional / inPackaging / missingParts = true or false. price = dollars or null for 'ask Sean'. photos = list of paths like /photos/abc.jpg (empty = 'Photo coming soon'). sold: true hides it. sample: true shows the 'Sample listing' badge. listed = YYYY-MM-DD (All parts is newest first).",
+ "items": [
+  {
+   "id": "openroad-pp2pl130097", "spot": ["tonneau_cover"], "listed": "2026-10-19", "sold": false,
+   "brand": "OPENROAD",
+   "part": "Aluminum hard tri-fold tonneau cover, 5 ft bed",
+   "partNumber": "PP2PL130097",
+   "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma", "note": "5 ft bed" }],
+   "size": "5 ft bed",
+   "condition": "New, factory sealed",
+   "conditionNotes": "Original packaging, never opened.",
+   "damaged": false, "functional": true, "inPackaging": true, "missingParts": false,
+   "price": 700,
+   "qty": "20+",
+   "shipping": null,
+   "description": "Low-profile aluminum hard cover that folds in three sections, so the bed stays covered and locked, or opens part way for tall loads. New and factory sealed.",
+   "video": null, "retailerLink": null, "photos": []
+  },
+  {
+   "id": "amp-76234-01a", "spot": ["running_board_l", "running_board_r"], "listed": "2026-10-19", "sold": false,
+   "brand": "AMP Research",
+   "part": "PowerStep Plug-N-Play electric running boards",
+   "partNumber": "76234-01A",
+   "fitment": [
+    { "years": [2008, 2016], "make": "Ford", "model": "F-250 Super Duty", "note": "" },
+    { "years": [2008, 2016], "make": "Ford", "model": "F-350 Super Duty", "note": "" },
+    { "years": [2008, 2016], "make": "Ford", "model": "F-450 Super Duty", "note": "" }
+   ],
+   "size": null,
+   "condition": "New, packaging flawed",
+   "conditionNotes": "Box has cosmetic damage only. The boards are not damaged and nothing is missing.",
+   "damaged": false, "functional": true, "inPackaging": true, "missingParts": false,
+   "price": 2000,
+   "shipping": "Free shipping in the lower 48. Alaska and Hawaii ship for extra.",
+   "description": "Automatic electric running boards: they swing out when a door opens and tuck out of sight under the truck when it closes. Plug-and-play install on these trucks.",
+   "video": "https://youtu.be/vp1sqmPKCic", "retailerLink": null, "photos": []
+  },
+  { "id": "sample-1", "sample": true, "spot": ["headlight_l"], "sold": false, "part": "Headlight assembly, driver side (SAMPLE)", "condition": "Used, tested", "price": null, "photos": [],
+    "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] },
+  { "id": "sample-2", "sample": true, "spot": ["tailgate"], "sold": false, "part": "Tailgate shell, needs paint (SAMPLE)", "condition": "Used", "price": null, "photos": [],
+    "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] },
+  { "id": "sample-3", "sample": true, "spot": ["mirror_r"], "sold": false, "part": "Power side mirror, passenger side (SAMPLE)", "condition": "Open box", "price": null, "photos": [],
+    "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] },
+  { "id": "sample-4", "sample": true, "spot": ["wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr"], "sold": false, "part": "Set of four 16 inch alloy wheels, 6 lug (SAMPLE)", "condition": "Used", "price": null, "photos": [],
+    "fitment": [{ "years": [2005, 2023], "make": "Toyota", "model": "Tacoma" }] },
+  { "id": "sample-5", "sample": true, "spot": ["grille"], "sold": false, "part": "Front grille, black (SAMPLE)", "condition": "New, open box", "price": null, "photos": [],
+    "fitment": [{ "years": [2018, 2023], "make": "Toyota", "model": "Tacoma" }] },
+  { "id": "sample-6", "sample": true, "spot": ["taillight_l", "taillight_r"], "sold": false, "part": "LED taillight pair (SAMPLE)", "condition": "New", "price": null, "photos": [],
+    "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] }
+ ]
 }

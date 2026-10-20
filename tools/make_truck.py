@@ -9,7 +9,7 @@
 import bpy, bmesh, math, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(os.path.dirname(HERE), "models", "tacoma-style.glb")
+OUT = os.path.join(os.path.dirname(HERE), "models", "tacoma-style-v1.glb")
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
