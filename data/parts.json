@@ -1,0 +1,17 @@
+{
+  "_readme": "Sean's parts for /parts. One object per item. spot = the mesh name on the truck (see README). fitment = list of {years:[from,to], make, model} or the string \"universal\". price = number in dollars or null for 'ask Sean'. photo = path like /photos/abc.jpg or null. sold: true hides it. sample: true shows the 'Sample listing' badge; delete the sample items once real ones are in.",
+  "items": [
+    { "id": "sample-1", "sample": true, "spot": ["headlight_l"], "title": "Headlight assembly, driver side (SAMPLE)", "price": null, "condition": "Used, tested", "photo": null, "sold": false,
+      "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] },
+    { "id": "sample-2", "sample": true, "spot": ["tailgate"], "title": "Tailgate shell, needs paint (SAMPLE)", "price": null, "condition": "Used", "photo": null, "sold": false,
+      "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] },
+    { "id": "sample-3", "sample": true, "spot": ["mirror_r"], "title": "Power side mirror, passenger side (SAMPLE)", "price": null, "condition": "Open box", "photo": null, "sold": false,
+      "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] },
+    { "id": "sample-4", "sample": true, "spot": ["wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr"], "title": "Set of four 16 inch alloy wheels, 6 lug (SAMPLE)", "price": null, "condition": "Used", "photo": null, "sold": false,
+      "fitment": [{ "years": [2005, 2023], "make": "Toyota", "model": "Tacoma" }] },
+    { "id": "sample-5", "sample": true, "spot": ["grille"], "title": "Front grille, black (SAMPLE)", "price": null, "condition": "New, open box", "photo": null, "sold": false,
+      "fitment": [{ "years": [2018, 2023], "make": "Toyota", "model": "Tacoma" }] },
+    { "id": "sample-6", "sample": true, "spot": ["taillight_l", "taillight_r"], "title": "LED taillight pair (SAMPLE)", "price": null, "condition": "New", "photo": null, "sold": false,
+      "fitment": [{ "years": [2016, 2023], "make": "Toyota", "model": "Tacoma" }] }
+  ]
+}

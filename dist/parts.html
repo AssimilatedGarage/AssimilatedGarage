@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shop by Vehicle | Assimilated Garage</title>
+<meta name="description" content="Pick your vehicle, spin it in 3D, open it up and tap the part you need. Sean Hopkins at Assimilated Garage will tell you what he has for it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Public+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="preload" href="/models/tacoma-style.glb" as="fetch" type="model/gltf-binary" crossorigin>
+<style>
+:root {
+  --bg: #e9e6df; --panel: #f6f4ef; --ink: #1d1f1c; --muted: #5f625b; --line: #c9c4b8;
+  --hivis: #f3c316; --hivis-ink: #1d1f1c; --rust: #b4471b; --ok: #2f7a43;
+  --night: #121310; --night-2: #1c1d19; --night-3: #26271f; --night-fg: #efede6; --night-muted: #a7a89e; --night-line: #ffffff1c;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #171815; --panel: #22231f; --ink: #ecebe5; --muted: #a3a49b; --line: #3a3b35; --rust: #e0703d; --ok: #5cb874; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #171815; --panel: #22231f; --ink: #ecebe5; --muted: #a3a49b; --line: #3a3b35; --rust: #e0703d; --ok: #5cb874; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; overflow-x: clip; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: .95; }
+a { color: inherit; }
+button, select { font: inherit; }
+:focus-visible { outline: 3px solid var(--hivis); outline-offset: 2px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* top bar (same as the homepage) */
+.bar { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--night) 90%, transparent); backdrop-filter: blur(8px); color: var(--night-fg); border-bottom: 1px solid var(--night-line); }
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 10px; }
+.logo { font-family: var(--display); font-weight: 900; font-size: 22px; letter-spacing: .02em; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.logo b { background: var(--hivis); color: var(--hivis-ink); padding: 0 6px; }
+.bar nav { display: flex; gap: 18px; font-size: 14px; font-weight: 500; align-items: center; }
+.bar nav a { text-decoration: none; opacity: .8; }
+.bar nav a:hover, .bar nav a[aria-current] { opacity: 1; }
+.bar nav a[aria-current] { box-shadow: inset 0 -2px var(--hivis); }
+.callbtn { background: var(--hivis); color: var(--hivis-ink) !important; opacity: 1 !important; padding: 6px 10px; font: 700 13px var(--mono); }
+@media (max-width: 600px) { .bar nav .hide-s, .bar nav a[aria-current] { display: none; } }
+
+/* garage: picker + viewer stay at night in both themes */
+.garage { background: radial-gradient(110% 80% at 60% 0%, #34301f 0%, var(--night-2) 40%, var(--night) 75%); color: var(--night-fg); }
+.head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 18px 28px; padding-block: 28px 18px; }
+.head h1 { font-size: clamp(40px, 6vw, 76px); font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; }
+.head h1 span { color: var(--hivis); }
+.head p { margin: 10px 0 0; color: var(--night-muted); max-width: 46ch; }
+.picker { display: grid; grid-template-columns: 96px minmax(130px, 1fr) minmax(150px, 1.2fr); gap: 8px; min-width: min(100%, 470px); }
+.picker label { display: grid; gap: 4px; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--night-muted); }
+.picker select { width: 100%; min-width: 0; appearance: none; background: #0c0d0b url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23f3c316' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 12px center; color: var(--night-fg); border: 1px solid #ffffff30; padding: 11px 32px 11px 12px; font: 600 15px var(--body); border-radius: 0; cursor: pointer; }
+.picker select:hover { border-color: var(--hivis); }
+.picker select:disabled { opacity: .55; cursor: progress; }
+@media (max-width: 560px) { .picker { grid-template-columns: 84px 1fr; } .picker label:last-child { grid-column: 1 / -1; } }
+
+.viewer { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 0; border-top: 1px solid var(--night-line); }
+.stage { position: relative; height: min(68vh, 640px); min-height: 380px; overflow: hidden; scroll-margin-top: 56px; }
+#truck { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; outline: none; }
+#truck.grabbing { cursor: grabbing; }
+.stage-top { position: absolute; top: 14px; left: 16px; right: 16px; display: flex; justify-content: space-between; gap: 10px; pointer-events: none; flex-wrap: wrap; }
+.stage-top > * { pointer-events: auto; }
+.vname { font: 600 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--night-muted); }
+.vname b { color: var(--night-fg); font-weight: 600; }
+.swatches { display: flex; gap: 6px; align-items: center; }
+.swatches button { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ffffff40; cursor: pointer; padding: 0; }
+.swatches button[aria-pressed="true"] { border-color: var(--hivis); box-shadow: 0 0 0 2px var(--night); }
+.stage-ui { position: absolute; left: 16px; right: 16px; bottom: 14px; display: flex; justify-content: space-between; align-items: end; gap: 10px; pointer-events: none; flex-wrap: wrap; }
+.stage-ui > * { pointer-events: auto; }
+.btn { font: 700 15px var(--body); padding: 12px 18px; border: 2px solid var(--hivis); background: var(--hivis); color: var(--hivis-ink); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn:hover { filter: brightness(1.06); }
+.btn.ghost { background: transparent; color: inherit; border-color: currentColor; }
+.btn svg { width: 18px; height: 18px; }
+.hint { font: 500 12px var(--mono); color: var(--night-muted); letter-spacing: .04em; }
+.demo-note { font: 500 11px var(--mono); color: #8d8e85; letter-spacing: .04em; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; font: 600 13px var(--mono); letter-spacing: .1em; color: var(--night-muted); pointer-events: none; transition: opacity .4s; }
+.loading.done { opacity: 0; }
+.soon { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; }
+.soon div { max-width: 40ch; }
+.soon h2 { font-size: clamp(30px, 4vw, 44px); text-transform: uppercase; margin: 8px 0 10px; }
+.soon p { color: var(--night-muted); margin: 0 0 18px; }
+.soon .eyebrow { color: var(--hivis); }
+
+/* side panel / bottom sheet */
+.panel { background: var(--night-2); border-left: 1px solid var(--night-line); color: var(--night-fg); display: flex; flex-direction: column; max-height: min(68vh, 640px); min-height: 380px; }
+.panel-head { padding: 18px 18px 12px; border-bottom: 1px solid var(--night-line); position: relative; }
+.panel-head .eyebrow { color: var(--night-muted); }
+.panel-head h2 { font-size: 34px; text-transform: uppercase; margin-top: 6px; padding-right: 36px; }
+.panel-head .count { font: 600 12px var(--mono); color: var(--hivis); margin-top: 6px; letter-spacing: .06em; text-transform: uppercase; }
+.panel-close { position: absolute; top: 14px; right: 12px; width: 36px; height: 36px; background: transparent; border: 1px solid #ffffff30; color: var(--night-fg); cursor: pointer; font-size: 20px; line-height: 1; }
+.panel-body { overflow-y: auto; padding: 14px 18px 18px; display: grid; gap: 12px; align-content: start; overscroll-behavior: contain; }
+.panel-body p { margin: 0; color: var(--night-muted); }
+.card { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; background: var(--night-3); border: 1px solid var(--night-line); padding: 10px; }
+.card .ph { aspect-ratio: 1; background: #1a1b17; display: block; width: 100%; height: auto; }
+.card h3 { font: 700 15px/1.3 var(--body); margin: 2px 0 4px; }
+.card .meta { font: 500 12px var(--mono); color: var(--night-muted); display: flex; gap: 8px; flex-wrap: wrap; }
+.card .price { font: 600 13px var(--mono); color: var(--night-fg); }
+.badge { display: inline-block; font: 700 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; background: var(--hivis); color: var(--hivis-ink); padding: 2px 6px; }
+.card .acts { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.card .acts .btn { padding: 9px 10px; font-size: 14px; }
+.empty { background: var(--night-3); border: 1px dashed #ffffff30; padding: 16px; display: grid; gap: 12px; }
+.empty h3 { font: 700 16px var(--body); }
+.empty .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.empty .acts .btn { padding: 10px; font-size: 14px; }
+.tip-list { margin: 0; padding-left: 18px; color: var(--night-muted); display: grid; gap: 6px; }
+
+@media (max-width: 900px) {
+  .viewer { grid-template-columns: minmax(0, 1fr); }
+  .stage { height: 52svh; min-height: 340px; max-height: 620px; }
+  .head { padding-block: 20px 14px; }
+  .panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; max-height: 44svh; min-height: 0; border-left: 0; border-top: 2px solid var(--hivis); transform: translateY(102%); transition: transform .32s cubic-bezier(.2,.8,.2,1); box-shadow: 0 -18px 40px #0008; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .panel.open { transform: none; }
+  .panel-head h2 { font-size: 28px; }
+}
+@media (min-width: 901px) { .panel-close { display: none; } }
+@media (prefers-reduced-motion: reduce) { .panel { transition: none; } }
+
+/* plain list */
+.list { padding-block: 40px 56px; }
+.list h2 { font-size: clamp(32px, 4vw, 48px); text-transform: uppercase; margin: 6px 0 6px; }
+.list > .wrap > p { color: var(--muted); margin: 0 0 20px; max-width: 60ch; }
+.spots { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+.spots button { width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--panel); border: 1px solid var(--line); color: var(--ink); padding: 12px 14px; cursor: pointer; font: 600 15px var(--body); }
+.spots button:hover { border-color: var(--ink); }
+.spots button[aria-current="true"] { border-color: var(--rust); box-shadow: inset 4px 0 var(--rust); }
+.spots .n { font: 600 12px var(--mono); color: var(--muted); white-space: nowrap; }
+.spots .n.has { color: var(--ok); }
+.foot { border-top: 1px solid var(--line); padding-block: 24px 40px; color: var(--muted); font-size: 14px; }
+.foot .wrap { display: flex; flex-wrap: wrap; gap: 10px 24px; justify-content: space-between; }
+.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--night); color: var(--night-fg); padding: 10px 14px; font: 600 13px var(--mono); z-index: 60; border: 1px solid var(--hivis); }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="/"><b>AG</b> Assimilated Garage</a>
+    <nav><a class="hide-s" href="/#shop">Shop</a><a href="/parts" aria-current="page">Shop by vehicle</a><a class="hide-s" href="/#contact">Contact</a><a class="callbtn" href="tel:+18583364943">Call Sean</a></nav>
+  </div>
+</header>
+
+<main>
+  <section class="garage">
+    <div class="wrap head">
+      <div>
+        <div class="eyebrow" style="color:var(--night-muted)">Shop by vehicle</div>
+        <h1>Find it <span>on the truck</span></h1>
+        <p>Pick your vehicle, spin it around, open it up and tap the part you need. Sean will tell you what he has for it.</p>
+      </div>
+      <form class="picker" id="picker" onsubmit="return false">
+        <label>Year<select id="year" aria-label="Year"></select></label>
+        <label>Make<select id="make" aria-label="Make"></select></label>
+        <label>Model<select id="model" aria-label="Model"></select></label>
+      </form>
+    </div>
+    <div class="viewer">
+      <div class="stage" id="stage">
+        <canvas id="truck" tabindex="0" aria-label="3D model of the truck. Drag to turn it, tap a part to see what Sean has for it."></canvas>
+        <div class="loading" id="loading">LOADING THE TRUCK</div>
+        <div class="soon" id="soon" hidden><div>
+          <div class="eyebrow">3D view coming soon</div>
+          <h2 id="soonName">This vehicle</h2>
+          <p>The 3D view is ready for the Toyota Tacoma first. Every part spot is listed below, so pick one and Sean will check what fits.</p>
+          <a class="btn" href="#list">See the part list</a>
+        </div></div>
+        <div class="stage-top" id="stageTop">
+          <span class="vname" id="vname">2021 <b>Toyota Tacoma</b></span>
+          <div class="swatches" id="swatches" aria-label="Paint color"></div>
+        </div>
+        <div class="stage-ui" id="stageUi">
+          <button class="btn" type="button" id="explode" aria-pressed="false">Open it up</button>
+          <div style="display:grid;justify-items:end;gap:2px;text-align:right">
+            <span class="hint" id="hint">DRAG TO TURN · TAP A PART</span>
+            <span class="demo-note">Tacoma-style demo model</span>
+          </div>
+        </div>
+      </div>
+      <aside class="panel" id="panel" aria-live="polite">
+        <div class="panel-head">
+          <div class="eyebrow" id="pVehicle">2021 Toyota Tacoma</div>
+          <h2 id="pTitle">Tap a part</h2>
+          <div class="count" id="pCount"></div>
+          <button class="panel-close" id="pClose" type="button" aria-label="Close">&times;</button>
+        </div>
+        <div class="panel-body" id="pBody">
+          <ul class="tip-list">
+            <li>Drag the truck to turn it, pinch or scroll to zoom.</li>
+            <li>Hit <b>Open it up</b> to pull every part out.</li>
+            <li>Tap any part to see what Sean has in stock for it.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="list" id="list">
+    <div class="wrap">
+      <div class="eyebrow">Every part spot</div>
+      <h2 id="listTitle">Parts for the Toyota Tacoma</h2>
+      <p>No 3D needed: tap any spot to see what Sean has for it, or text him to find it.</p>
+      <ul class="spots" id="spots">
+        <li><button type="button" data-spot="hood">Hood <span class="n"></span></button></li>
+        <li><button type="button" data-spot="grille">Grille <span class="n"></span></button></li>
+        <li><button type="button" data-spot="bumper_front">Front bumper <span class="n"></span></button></li>
+        <li><button type="button" data-spot="headlight_l">Headlight, driver side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="headlight_r">Headlight, passenger side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="engine">Engine and engine parts <span class="n"></span></button></li>
+        <li><button type="button" data-spot="door_fl">Front door, driver side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="door_fr">Front door, passenger side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="door_rl">Rear door, driver side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="door_rr">Rear door, passenger side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="mirror_l">Side mirror, driver side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="mirror_r">Side mirror, passenger side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="wheel_fl">Wheel and tire, front driver <span class="n"></span></button></li>
+        <li><button type="button" data-spot="wheel_fr">Wheel and tire, front passenger <span class="n"></span></button></li>
+        <li><button type="button" data-spot="wheel_rl">Wheel and tire, rear driver <span class="n"></span></button></li>
+        <li><button type="button" data-spot="wheel_rr">Wheel and tire, rear passenger <span class="n"></span></button></li>
+        <li><button type="button" data-spot="body_cab">Cab, body and glass <span class="n"></span></button></li>
+        <li><button type="button" data-spot="bed">Bed <span class="n"></span></button></li>
+        <li><button type="button" data-spot="tailgate">Tailgate <span class="n"></span></button></li>
+        <li><button type="button" data-spot="taillight_l">Taillight, driver side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="taillight_r">Taillight, passenger side <span class="n"></span></button></li>
+        <li><button type="button" data-spot="bumper_rear">Rear bumper <span class="n"></span></button></li>
+      </ul>
+    </div>
+  </section>
+</main>
+<footer class="foot">
+  <div class="wrap">
+    <span>Assimilated Garage · Sean Hopkins · <a href="tel:+18583364943">(858) 336-4943</a></span>
+    <span><a href="/">Back to the shelf</a></span>
+  </div>
+</footer>
+
+<script type="module">
+const PHONE = "+18583364943";
+const MAKES = ["Acura","Audi","BMW","Buick","Cadillac","Chevrolet","Chrysler","Dodge","Ford","GMC","Honda","Hyundai","Infiniti","Jeep","Kia","Land Rover","Lexus","Lincoln","Mazda","Mercedes-Benz","Mini","Mitsubishi","Nissan","Ram","Subaru","Tesla","Toyota","Volkswagen","Volvo"];
+// explode: direction (three.js axes: X forward, Y up, driver side = -Z) and a small turn, both scaled by the eased progress
+const SPOTS = {
+  hood:        { label: "Hood", dir: [0.95, 0.95, 0], rot: [0, 0, 0.32] },
+  grille:      { label: "Grille", dir: [0.62, 0.05, 0] },
+  bumper_front:{ label: "Front bumper", dir: [0.95, -0.12, 0] },
+  headlight_l: { label: "Headlight, driver side", dir: [0.62, 0.12, -0.2] },
+  headlight_r: { label: "Headlight, passenger side", dir: [0.62, 0.12, 0.2] },
+  engine:      { label: "Engine and engine parts", dir: [0.1, 0.78, 0] },
+  door_fl:     { label: "Front door, driver side", dir: [0.08, 0, -0.85], rot: [0, -0.4, 0] },
+  door_fr:     { label: "Front door, passenger side", dir: [0.08, 0, 0.85], rot: [0, 0.4, 0] },
+  door_rl:     { label: "Rear door, driver side", dir: [-0.08, 0, -0.85], rot: [0, -0.4, 0] },
+  door_rr:     { label: "Rear door, passenger side", dir: [-0.08, 0, 0.85], rot: [0, 0.4, 0] },
+  mirror_l:    { label: "Side mirror, driver side", dir: [0.15, 0.25, -1.25] },
+  mirror_r:    { label: "Side mirror, passenger side", dir: [0.15, 0.25, 1.25] },
+  wheel_fl:    { label: "Wheel and tire, front driver", dir: [0.1, 0, -0.75] },
+  wheel_fr:    { label: "Wheel and tire, front passenger", dir: [0.1, 0, 0.75] },
+  wheel_rl:    { label: "Wheel and tire, rear driver", dir: [-0.1, 0, -0.75] },
+  wheel_rr:    { label: "Wheel and tire, rear passenger", dir: [-0.1, 0, 0.75] },
+  body_cab:    { label: "Cab, body and glass", dir: [0, 0, 0] },
+  bed:         { label: "Bed", dir: [-0.9, 0.12, 0] },
+  tailgate:    { label: "Tailgate", dir: [-1.6, 0.05, 0], rot: [0, 0, 0.5] },
+  taillight_l: { label: "Taillight, driver side", dir: [-1.3, 0.12, -0.12] },
+  taillight_r: { label: "Taillight, passenger side", dir: [-1.3, 0.12, 0.12] },
+  bumper_rear: { label: "Rear bumper", dir: [-1.4, -0.1, 0] },
+};
+const PAINTS = [
+  { name: "Army green", hex: "#4b5340" },
+  { name: "Cement gray", hex: "#8b8c88" },
+  { name: "Glacier white", hex: "#e4e4e0" },
+  { name: "Midnight black", hex: "#17181a" },
+  { name: "Hi-vis yellow", hex: "#d9ac12" },
+];
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// ---------------- vehicle picker (NHTSA vPIC) ----------------
+const params = new URLSearchParams(location.search);
+const state = { year: +params.get("year") || 2021, make: params.get("make") || "Toyota", model: params.get("model") || "Tacoma", spot: null };
+const yearSel = $("year"), makeSel = $("make"), modelSel = $("model");
+const thisYear = new Date().getFullYear() + 1;
+for (let y = thisYear; y >= 1985; y--) yearSel.add(new Option(y, y));
+MAKES.forEach((m) => makeSel.add(new Option(m, m)));
+if (!MAKES.includes(state.make)) makeSel.add(new Option(state.make, state.make));
+yearSel.value = state.year; makeSel.value = state.make;
+
+function cacheGet(k) { try { return JSON.parse(sessionStorage.getItem(k)); } catch { return null; } }
+function cacheSet(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch {} }
+async function loadModels() {
+  const key = `vpic:${state.make}:${state.year}`;
+  let models = cacheGet(key);
+  if (!models) {
+    modelSel.disabled = true;
+    try {
+      const r = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/${encodeURIComponent(state.make)}/modelyear/${state.year}?format=json`);
+      const j = await r.json();
+      models = [...new Set(j.Results.map((x) => x.Model_Name.trim()))].sort((a, b) => a.localeCompare(b));
+      if (models.length) cacheSet(key, models);
+    } catch { models = []; }
+    modelSel.disabled = false;
+  }
+  if (state.make === "Toyota" && !models.some((m) => /tacoma/i.test(m))) models = ["Tacoma", ...models];
+  if (!models.length) models = ["Other / not listed"];
+  modelSel.innerHTML = "";
+  models.forEach((m) => modelSel.add(new Option(m, m)));
+  const keep = models.find((m) => m.toLowerCase() === String(state.model).toLowerCase());
+  modelSel.value = keep || models[0];
+  state.model = modelSel.value;
+  vehicleChanged();
+}
+yearSel.onchange = () => { state.year = +yearSel.value; loadModels(); };
+makeSel.onchange = () => { state.make = makeSel.value; loadModels(); };
+modelSel.onchange = () => { state.model = modelSel.value; vehicleChanged(); };
+const vehicleName = () => `${state.year} ${state.make} ${state.model}`;
+const isTacoma = () => state.make === "Toyota" && /tacoma/i.test(state.model);
+
+// ---------------- inventory ----------------
+let ITEMS = [];
+const fits = (it) => !it.sold && (it.fitment === "universal" || (it.fitment || []).some((f) =>
+  state.year >= f.years[0] && state.year <= f.years[1] && f.make.toLowerCase() === state.make.toLowerCase() && f.model.toLowerCase() === state.model.toLowerCase()));
+const spotsOf = (it) => [].concat(it.spot);
+const itemsFor = (spot) => ITEMS.filter((it) => fits(it) && spotsOf(it).includes(spot));
+
+function vehicleChanged() {
+  const name = vehicleName();
+  history.replaceState(null, "", `/parts?year=${state.year}&make=${encodeURIComponent(state.make)}&model=${encodeURIComponent(state.model)}`);
+  $("vname").innerHTML = `${state.year} <b>${esc(state.make + " " + state.model)}</b>`;
+  $("pVehicle").textContent = name;
+  $("listTitle").textContent = `Parts for the ${name}`;
+  $("soonName").textContent = name;
+  document.querySelectorAll("#spots button").forEach((b) => {
+    const n = itemsFor(b.dataset.spot).length, el = b.querySelector(".n");
+    el.textContent = n ? `${n} in stock` : "Ask Sean";
+    el.classList.toggle("has", n > 0);
+  });
+  const t = isTacoma();
+  $("soon").hidden = t;
+  $("truck").hidden = !t; $("stageTop").hidden = !t; $("stageUi").hidden = !t;
+  if (t) start3D(); else $("loading").classList.add("done");
+  if (state.spot) showSpot(state.spot, false); else resetPanel();
+}
+
+// ---------------- panel ----------------
+const PH = `<svg class="ph" viewBox="0 0 92 92" role="img" aria-label="Photo coming soon"><rect width="92" height="92" fill="#1a1b17"/><path d="M30 38h32v22H30z M38 38l4-6h8l4 6" fill="none" stroke="#5a5b52" stroke-width="2"/><circle cx="46" cy="49" r="6" fill="none" stroke="#5a5b52" stroke-width="2"/><text x="46" y="75" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#8d8e85">PHOTO COMING</text><text x="46" y="84" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="7.5" fill="#8d8e85">SOON</text></svg>`;
+const ICON_TXT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H8l-4 4z"/></svg>`;
+const ICON_CALL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg>`;
+const sms = (body) => `sms:${PHONE}?&body=${encodeURIComponent(body)}`;
+const panel = $("panel");
+function resetPanel() {
+  state.spot = null;
+  $("pTitle").textContent = "Tap a part";
+  $("pCount").textContent = "";
+  $("pBody").innerHTML = `<ul class="tip-list"><li>Drag the truck to turn it, pinch or scroll to zoom.</li><li>Hit <b>Open it up</b> to pull every part out.</li><li>Tap any part to see what Sean has in stock for it.</li></ul>`;
+  panel.classList.remove("open");
+  document.querySelectorAll("#spots button").forEach((b) => b.removeAttribute("aria-current"));
+}
+function showSpot(spot, openSheet = true) {
+  state.spot = spot;
+  const label = SPOTS[spot].label, items = itemsFor(spot), v = vehicleName();
+  $("pTitle").textContent = label;
+  $("pCount").textContent = items.length ? `${items.length} in stock for this spot` : "Nothing in stock right now";
+  const call = `<a class="btn ghost" href="tel:${PHONE}">${ICON_CALL}Call</a>`;
+  $("pBody").innerHTML = items.length ? items.map((it) => `
+    <article class="card">
+      ${it.photo ? `<img class="ph" src="${esc(it.photo)}" alt="${esc(it.title)}" loading="lazy">` : PH}
+      <div>
+        ${it.sample ? `<span class="badge">Sample listing</span>` : ""}
+        <h3>${esc(it.title)}</h3>
+        <div class="meta"><span class="price">${it.price != null ? "$" + Number(it.price).toLocaleString() : "Price: ask Sean"}</span><span>${esc(it.condition || "")}</span></div>
+      </div>
+      <div class="acts">
+        <a class="btn" href="${sms(`Hi Sean, is the "${it.title}" still available? It's for the ${label.toLowerCase()} on my ${v}. (assimilatedgarage.com)`)}">${ICON_TXT}Text Sean</a>
+        ${call}
+      </div>
+    </article>`).join("") : `
+    <div class="empty">
+      <h3>Ask Sean to find it</h3>
+      <p>He opens new pallets every week and knows where to look. Send him the part and your vehicle.</p>
+      <div class="acts">
+        <a class="btn" href="${sms(`Hi Sean, can you find me a ${label.toLowerCase()} for my ${v}? (assimilatedgarage.com)`)}">${ICON_TXT}Text Sean</a>
+        ${call}
+      </div>
+    </div>`;
+  if (openSheet) {
+    panel.classList.add("open");
+    if (innerWidth <= 900 && isTacoma()) $("stage").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  }
+  document.querySelectorAll("#spots button").forEach((b) => b.dataset.spot === spot ? b.setAttribute("aria-current", "true") : b.removeAttribute("aria-current"));
+}
+$("pClose").onclick = () => { panel.classList.remove("open"); select(null); };
+document.querySelectorAll("#spots button").forEach((b) => b.onclick = () => {
+  const spot = b.dataset.spot;
+  showSpot(spot);
+  if (isTacoma()) { select(spot); if (innerWidth > 900) $("stage").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" }); }
+});
+
+// ---------------- 3D ----------------
+let three = null, select = () => {};
+async function start3D() {
+  if (three) return;
+  three = {};
+  const THREE = await import("three");
+  const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
+  const { OrbitControls } = await import("three/addons/controls/OrbitControls.js");
+  const { RoomEnvironment } = await import("three/addons/environments/RoomEnvironment.js");
+
+  const canvas = $("truck"), stage = $("stage");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.92;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.75;
+
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+  const controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.enablePan = false;
+  controls.minDistance = 5; controls.maxDistance = 20;
+  controls.maxPolarAngle = Math.PI * 0.49; controls.minPolarAngle = Math.PI * 0.12;
+  controls.target.set(0, 0.85, 0);
+  controls.autoRotate = !reduce; controls.autoRotateSpeed = 0.9;
+
+  // key light with a soft shadow + a cool rim
+  const key = new THREE.DirectionalLight(0xfff4e0, 2.2);
+  key.position.set(4, 9, 5); key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 6; key.shadow.bias = -0.0004;
+  Object.assign(key.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 25 });
+  scene.add(key);
+  const rim = new THREE.DirectionalLight(0xbcd2ff, 1.1); rim.position.set(-6, 4, -6); scene.add(rim);
+  scene.add(new THREE.HemisphereLight(0xfff8ec, 0x1a1a14, 0.35));
+
+  // floor: shadow catcher + a soft contact blob
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(12, 64), new THREE.ShadowMaterial({ opacity: 0.42 }));
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+  const c2 = document.createElement("canvas"); c2.width = c2.height = 256;
+  const g = c2.getContext("2d"), gr = g.createRadialGradient(128, 128, 10, 128, 128, 128);
+  gr.addColorStop(0, "rgba(0,0,0,.75)"); gr.addColorStop(0.55, "rgba(0,0,0,.35)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, 256, 256);
+  const blob = new THREE.Mesh(new THREE.PlaneGeometry(7.6, 3.4), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c2), transparent: true, depthWrite: false }));
+  blob.rotation.x = -Math.PI / 2; blob.position.y = 0.003; scene.add(blob);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(4.2, 4.23, 128), new THREE.MeshBasicMaterial({ color: 0xf3c316, transparent: true, opacity: 0.18 }));
+  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.002; scene.add(ring);
+
+  // tuned materials by name (a swapped-in model keeps its own if names differ)
+  const paint = new THREE.MeshPhysicalMaterial({ color: PAINTS[0].hex, metalness: 0.3, roughness: 0.45, clearcoat: 0.8, clearcoatRoughness: 0.12 });
+  const MATS = {
+    paint,
+    trim_black: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.75 }),
+    gloss_black: new THREE.MeshPhysicalMaterial({ color: 0x060606, roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.05 }),
+    glass: new THREE.MeshPhysicalMaterial({ color: 0x0a0f13, roughness: 0.03, metalness: 0.1, transparent: true, opacity: 0.82, clearcoat: 1, envMapIntensity: 1.6 }),
+    tire: new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.93 }),
+    rim: new THREE.MeshStandardMaterial({ color: 0x8e9296, metalness: 1, roughness: 0.28 }),
+    rim_dark: new THREE.MeshStandardMaterial({ color: 0x1c1d1e, metalness: 0.6, roughness: 0.45 }),
+    chrome: new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 1, roughness: 0.12 }),
+    lamp_clear: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2, emissive: 0xf4f8ff, emissiveIntensity: 1.4 }),
+    lamp_lens: new THREE.MeshPhysicalMaterial({ color: 0x1b1e22, metalness: 0.5, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.02 }),
+    lamp_red: new THREE.MeshPhysicalMaterial({ color: 0x8c0f0f, roughness: 0.12, emissive: 0x6a0000, emissiveIntensity: 0.9, clearcoat: 1 }),
+    engine_metal: new THREE.MeshStandardMaterial({ color: 0x3c3e41, metalness: 0.8, roughness: 0.45 }),
+    engine_alu: new THREE.MeshStandardMaterial({ color: 0xa9acb0, metalness: 1, roughness: 0.32 }),
+    underbody: new THREE.MeshStandardMaterial({ color: 0x0b0b0b, roughness: 0.95 }),
+  };
+  // highlight + dim variants per base material, built lazily
+  const HI = new Map(), DIM = new Map();
+  const hi = (m) => { if (!HI.has(m)) { const c = m.clone(); c.emissive = new THREE.Color(0xf3c316); c.emissiveIntensity = m === paint || m.color.getHSL({}).l > 0.05 ? 0.38 : 0.55; HI.set(m, c); } return HI.get(m); };
+  const dim = (m) => { if (!DIM.has(m)) { const c = m.clone(); c.transparent = true; c.opacity = m.transparent ? 0.14 : 0.22; c.depthWrite = false; DIM.set(m, c); } return DIM.get(m); };
+
+  const gltf = await new GLTFLoader().loadAsync("/models/tacoma-style.glb");
+  const truck = gltf.scene; scene.add(truck);
+  const parts = {};
+  truck.traverse((o) => {
+    if (SPOTS[o.name] && !parts[o.name]) parts[o.name] = o;
+    if (o.isMesh) {
+      o.castShadow = true; o.receiveShadow = true;
+      const base = MATS[o.material.name] || o.material;
+      o.userData.base = base; o.material = base;
+    }
+  });
+  const spotOf = (o) => { while (o && !SPOTS[o.name]) o = o.parent; return o ? o.name : null; };
+  for (const [name, o] of Object.entries(parts)) {
+    o.userData.p0 = o.position.clone(); o.userData.q0 = o.quaternion.clone();
+    o.userData.dir = new THREE.Vector3(...SPOTS[name].dir); o.userData.rot = SPOTS[name].rot || [0, 0, 0];
+    o.traverse((m) => { if (m.isMesh) m.userData.spot = name; });
+  }
+
+  // swatches
+  const sw = $("swatches");
+  PAINTS.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.title = p.name; b.setAttribute("aria-label", "Paint " + p.name); b.style.background = p.hex;
+    b.setAttribute("aria-pressed", i === 0);
+    b.onclick = () => {
+      paint.color.set(p.hex); [HI, DIM].forEach((mp) => mp.has(paint) && mp.get(paint).color.set(p.hex));
+      sw.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    };
+    sw.appendChild(b);
+  });
+
+  // framing
+  let baseDist = 12;
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    const fitW = 6.6 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect);
+    const fitH = 3.0 / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+    baseDist = Math.max(fitW, fitH) * 1.05;
+  }
+  resize();
+  camera.position.set(0.62, 0.30, 0.72).normalize().multiplyScalar(baseDist).add(controls.target);
+  new ResizeObserver(resize).observe(stage);
+
+  // explode tween
+  let prog = 0, from = 0, to = 0, t0 = 0, distFrom = 0, distTo = 0;
+  const DUR = reduce ? 1 : 800;
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const tmpE = new THREE.Euler(), tmpQ = new THREE.Quaternion();
+  function applyExplode(e) {
+    for (const o of Object.values(parts)) {
+      const { p0, q0, dir, rot } = o.userData;
+      o.position.copy(p0).addScaledVector(dir, e);
+      tmpE.set(rot[0] * e, rot[1] * e, rot[2] * e); tmpQ.setFromEuler(tmpE);
+      o.quaternion.copy(q0).multiply(tmpQ);
+    }
+  }
+  const btn = $("explode");
+  btn.onclick = () => {
+    from = prog; to = to ? 0 : 1; t0 = performance.now();
+    const d = camera.position.distanceTo(controls.target);
+    distFrom = d; distTo = to ? Math.min(controls.maxDistance, d * 1.28) : Math.max(controls.minDistance, d / 1.28);
+    btn.textContent = to ? "Close it" : "Open it up"; btn.setAttribute("aria-pressed", !!to);
+  };
+
+  // selection
+  let selected = null;
+  select = (spot) => {
+    selected = spot && parts[spot] ? spot : null;
+    truck.traverse((m) => {
+      if (!m.isMesh) return;
+      const b = m.userData.base;
+      m.material = !selected ? b : m.userData.spot === selected ? hi(b) : dim(b);
+      m.renderOrder = selected && m.userData.spot !== selected ? 1 : 0;
+    });
+    $("hint").textContent = selected ? "TAP EMPTY SPACE TO CLEAR" : "DRAG TO TURN · TAP A PART";
+    if (selected) controls.autoRotate = false;
+  };
+  const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+  let down = null;
+  canvas.addEventListener("pointerdown", (e) => { down = [e.clientX, e.clientY]; canvas.classList.add("grabbing"); });
+  canvas.addEventListener("pointerup", (e) => {
+    canvas.classList.remove("grabbing");
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) { down = null; return; }
+    down = null;
+    const r = canvas.getBoundingClientRect();
+    ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ptr, camera);
+    const hit = ray.intersectObject(truck, true).find((h) => h.object.visible);
+    const spot = hit ? hit.object.userData.spot || spotOf(hit.object) : null;
+    if (spot) { select(spot); showSpot(spot); } else { select(null); resetPanel(); }
+  });
+  let idle;
+  controls.addEventListener("start", () => { controls.autoRotate = false; clearTimeout(idle); });
+  controls.addEventListener("end", () => { clearTimeout(idle); if (!reduce) idle = setTimeout(() => { if (!selected) controls.autoRotate = true; }, 7000); });
+
+  renderer.setAnimationLoop((now) => {
+    if (prog !== to) {
+      const t = Math.min(1, (now - t0) / DUR), e = ease(t);
+      prog = t >= 1 ? to : from + (to - from) * e;
+      applyExplode(prog);
+      const d = distFrom + (distTo - distFrom) * e;
+      camera.position.sub(controls.target).setLength(d).add(controls.target);
+    }
+    controls.update();
+    renderer.render(scene, camera);
+  });
+  $("loading").classList.add("done");
+  three = { select, parts };
+  if (state.spot) select(state.spot);
+  window.__truck = { select, explode: () => btn.click(), parts: Object.keys(parts), controls, camera,
+    screenOf: (n) => { const v = new THREE.Vector3(); parts[n].getWorldPosition(v); v.project(camera); const r = canvas.getBoundingClientRect(); return [r.left + (v.x + 1) / 2 * r.width, r.top + (1 - v.y) / 2 * r.height]; } };
+}
+
+fetch("/data/parts.json").then((r) => r.json()).then((j) => { ITEMS = j.items || []; }).catch(() => {}).finally(loadModels);
+</script>
+</body>
+</html>
