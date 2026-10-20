@@ -3,12 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Shop by Vehicle | Assimilated Garage</title>
-<meta name="description" content="Pick your vehicle, spin it in 3D, open it up and tap the part you need. Sean Hopkins at Assimilated Garage will tell you what he has for it.">
+<title>Browse the Truck | Assimilated Garage</title>
+<meta name="description" content="Swipe through the parts in the back of the truck, or pick your vehicle, spin it in 3D and tap the part you need. Sean Hopkins at Assimilated Garage will tell you what he has for it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Public+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
-<link rel="preload" href="/models/tacoma-style.glb" as="fetch" type="model/gltf-binary" crossorigin>
 <style>
 :root {
   --bg: #e9e6df; --panel: #f6f4ef; --ink: #1d1f1c; --muted: #5f625b; --line: #c9c4b8;
@@ -48,8 +47,8 @@ button, select { font: inherit; }
 /* garage: picker + viewer stay at night in both themes */
 .garage { background: radial-gradient(110% 80% at 60% 0%, #34301f 0%, var(--night-2) 40%, var(--night) 75%); color: var(--night-fg); }
 .head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 18px 28px; padding-block: 28px 18px; }
-.head h1 { font-size: clamp(40px, 6vw, 76px); font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; }
-.head h1 span { color: var(--hivis); }
+.head h1, .head .h1 { font-size: clamp(40px, 6vw, 76px); font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; }
+.head h1 span, .head .h1 span { color: var(--hivis); }
 .head p { margin: 10px 0 0; color: var(--night-muted); max-width: 46ch; }
 .picker { display: grid; grid-template-columns: 96px minmax(130px, 1fr) minmax(150px, 1.2fr); gap: 8px; min-width: min(100%, 470px); }
 .picker label { display: grid; gap: 4px; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--night-muted); }
@@ -143,6 +142,64 @@ button, select { font: inherit; }
 .yt-play::after { content: ""; position: absolute; left: 22px; top: 11px; border-style: solid; border-width: 8px 0 8px 13px; border-color: transparent transparent transparent #fff; }
 .yt-cap { position: absolute; left: 8px; bottom: 6px; font: 600 11px/1 "IBM Plex Mono", monospace; color: #fff; text-shadow: 0 1px 2px #000; }
 .yt-frame { display: block; width: 100%; max-width: 280px; aspect-ratio: 16 / 9; border: 0; border-radius: 6px; margin-top: 2px; }
+
+/* truck-bed showroom (night in both themes) */
+.showroom { background: #0d0e0b; color: var(--night-fg); position: relative; scroll-margin-top: 50px; }
+.sr-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; padding-block: 22px 14px; }
+.sr-head .eyebrow { color: var(--night-muted); margin-bottom: 6px; }
+.sr-head h1 { font-size: clamp(40px, 6vw, 76px); font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; }
+.sr-head h1 span { color: var(--hivis); }
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; max-width: 100%; padding: 2px; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; font: 600 14px var(--body); padding: 8px 14px; border-radius: 999px; border: 1px solid #ffffff33; background: #ffffff0a; color: var(--night-fg); cursor: pointer; white-space: nowrap; }
+.chip:hover { border-color: var(--hivis); }
+.chip[aria-pressed="true"] { background: var(--hivis); color: var(--hivis-ink); border-color: var(--hivis); }
+.sr-pick { padding-bottom: 14px; }
+.sr-pick .picker { max-width: 540px; }
+.sr-stage { position: relative; height: min(76svh, 760px); min-height: 520px; overflow: hidden; outline: none; }
+.sr-stage:focus-visible { box-shadow: inset 0 0 0 3px var(--hivis); }
+#bedCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
+#bedCanvas.grabbing { cursor: grabbing; }
+.sr-count { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); font: 600 13px var(--mono); letter-spacing: .14em; background: #000a; border: 1px solid #ffffff22; padding: 5px 12px; white-space: nowrap; }
+.sr-count b { color: var(--hivis); font-weight: 600; }
+.sr-arrow { position: absolute; top: 42%; transform: translateY(-50%); width: 54px; height: 54px; border-radius: 50%; border: 1px solid #ffffff3a; background: #0d0e0bb8; color: var(--night-fg); display: grid; place-items: center; cursor: pointer; padding: 0; backdrop-filter: blur(6px); }
+.sr-arrow:hover { border-color: var(--hivis); color: var(--hivis); }
+.sr-arrow svg { width: 22px; height: 22px; }
+.sr-arrow.prev { left: 20px; } .sr-arrow.next { right: 20px; }
+.sr-hint { position: absolute; top: 18px; right: 20px; font: 500 11px var(--mono); color: var(--night-muted); letter-spacing: .1em; }
+.sr-card { position: absolute; left: 24px; bottom: 24px; width: 390px; background: #121310d9; backdrop-filter: blur(10px); border: 1px solid #ffffff1f; border-top: 3px solid var(--hivis); padding: 16px 18px 18px; display: grid; gap: 6px; transition: opacity .25s; }
+.sr-card.swap { opacity: .2; }
+.sr-card .eyebrow { color: var(--night-muted); display: flex; gap: 8px; align-items: center; }
+.sr-top { display: flex; justify-content: space-between; gap: 14px; align-items: start; }
+.sr-card h2 { font-size: 30px; font-weight: 800; text-transform: uppercase; line-height: .98; }
+.sr-price { font: 800 34px/1 var(--display); color: var(--hivis); white-space: nowrap; }
+.sr-fit { font-size: 14px; color: var(--night-fg); opacity: .85; line-height: 1.35; }
+.sr-meta { font: 500 12px var(--mono); color: var(--night-muted); display: flex; gap: 6px 12px; flex-wrap: wrap; text-transform: uppercase; letter-spacing: .04em; }
+.sr-acts { display: grid; grid-template-columns: 1.25fr 1fr .8fr; gap: 8px; margin-top: 6px; }
+.sr-acts .btn { padding: 10px 8px; font-size: 14px; }
+.sr-acts .btn.ghost { color: var(--night-fg); border-color: #ffffff55; white-space: nowrap; }
+@media (max-width: 420px) { .sr-acts .btn { font-size: 13.5px; gap: 5px; padding-inline: 6px; } .sr-acts .btn svg { width: 15px; height: 15px; } }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 700px) {
+  .sr-head { padding-block: 16px 10px; }
+  .sr-stage { height: 80svh; min-height: 560px; max-height: 760px; }
+  .sr-card { left: 10px; right: 10px; bottom: 10px; width: auto; padding: 12px 14px 14px; gap: 4px; }
+  .sr-card h2 { font-size: 24px; }
+  .sr-price { font-size: 28px; }
+  .sr-arrow { width: 46px; height: 46px; top: 30%; }
+  .sr-arrow.prev { left: 8px; } .sr-arrow.next { right: 8px; }
+  .sr-hint { display: none; }
+}
+.sr-sheet { border: 0; padding: 0; background: var(--night-2); color: var(--night-fg); width: min(560px, 100vw); max-width: 100vw; max-height: 88svh; border-top: 3px solid var(--hivis); overscroll-behavior: contain; }
+.sr-sheet::backdrop { background: #000b; }
+.sh-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--night-line); position: sticky; top: 0; background: var(--night-2); z-index: 1; }
+.sh-head .eyebrow { color: var(--night-muted); }
+.sh-close { width: 38px; height: 38px; background: transparent; border: 1px solid #ffffff30; color: var(--night-fg); cursor: pointer; font-size: 22px; line-height: 1; flex: none; }
+.sh-body { padding: 14px 16px 18px; }
+.sh-body .card { grid-template-columns: 1fr; }
+.sh-body .card .ph { max-width: 120px; }
+.sh-body .card .btn.ghost { color: var(--night-fg); }
+@media (max-width: 700px) { .sr-sheet { margin: auto 0 0 0; width: 100vw; } }
 </style>
 <script type="importmap">
 { "imports": {
@@ -160,11 +217,41 @@ button, select { font: inherit; }
 </header>
 
 <main>
+  <section class="showroom" id="showroom" aria-labelledby="srTitle">
+    <div class="wrap sr-head">
+      <div>
+        <div class="eyebrow">In the back of the truck</div>
+        <h1 id="srTitle">Browse <span>the truck</span></h1>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="Filter the parts in the truck bed">
+        <button type="button" class="chip" data-f="all" aria-pressed="true">All</button>
+        <button type="button" class="chip" data-f="boards" aria-pressed="false">Running boards</button>
+        <button type="button" class="chip" data-f="covers" aria-pressed="false">Bed covers</button>
+        <button type="button" class="chip" data-f="fits" aria-pressed="false">Fits my vehicle</button>
+      </div>
+    </div>
+    <div class="wrap sr-pick" id="srPick" hidden></div>
+    <div class="sr-stage" id="srStage" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Parts in the truck bed. Use the left and right arrow keys to see the next part.">
+      <canvas id="bedCanvas" aria-hidden="true"></canvas>
+      <div class="loading" id="srLoading">LOADING THE TRUCK</div>
+      <div class="sr-count" id="srCount" aria-hidden="true"></div>
+      <span class="sr-hint" aria-hidden="true">SWIPE · SCROLL · ← →</span>
+      <button class="sr-arrow prev" id="srPrev" type="button" aria-label="Previous part"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="sr-arrow next" id="srNext" type="button" aria-label="Next part"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 5l7 7-7 7"/></svg></button>
+      <article class="sr-card" id="srCard"></article>
+      <div class="sr-only" id="srLive" aria-live="polite"></div>
+    </div>
+  </section>
+  <dialog class="sr-sheet" id="srSheet" aria-labelledby="shTitle">
+    <div class="sh-head"><div><div class="eyebrow">Full listing</div><div id="shTitle" style="font:800 22px/1.05 var(--display);text-transform:uppercase">Details</div></div><button class="sh-close" id="shClose" type="button" aria-label="Close">&times;</button></div>
+    <div class="sh-body" id="shBody"></div>
+  </dialog>
+
   <section class="garage">
     <div class="wrap head">
       <div>
         <div class="eyebrow" style="color:var(--night-muted)">Shop by vehicle</div>
-        <h1>Find it <span>on the truck</span></h1>
+        <h2 class="h1">Find it <span>on the truck</span></h2>
         <p>Pick your vehicle, spin it around, open it up and tap the part you need. Sean will tell you what he has for it.</p>
       </div>
       <form class="picker" id="picker" onsubmit="return false">
@@ -374,6 +461,7 @@ function vehicleChanged() {
   $("truck").hidden = !t; $("stageTop").hidden = !t; $("stageUi").hidden = !t;
   if (t) start3D(); else $("loading").classList.add("done");
   if (state.spot) showSpot(state.spot, false); else resetPanel();
+  showroom.vehicleChanged?.();
 }
 
 // ---------------- panel ----------------
@@ -481,7 +569,6 @@ async function start3D() {
   if (three) return;
   three = {};
   const THREE = await import("three");
-  const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
   const { OrbitControls } = await import("three/addons/controls/OrbitControls.js");
   const { RoomEnvironment } = await import("three/addons/environments/RoomEnvironment.js");
 
@@ -548,9 +635,7 @@ async function start3D() {
   const hi = (m) => { if (!HI.has(m)) { const c = m.clone(); c.emissive = new THREE.Color(0xf3c316); c.emissiveIntensity = m === paint || m.color.getHSL({}).l > 0.05 ? 0.38 : 0.55; HI.set(m, c); } return HI.get(m); };
   const dim = (m) => { if (!DIM.has(m)) { const c = m.clone(); c.transparent = true; c.opacity = m.transparent ? 0.14 : 0.22; c.depthWrite = false; DIM.set(m, c); } return DIM.get(m); };
 
-  const { DRACOLoader } = await import("three/addons/loaders/DRACOLoader.js");
-  const draco = new DRACOLoader().setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/libs/draco/gltf/");
-  const gltf = await new GLTFLoader().setDRACOLoader(draco).loadAsync("/models/tacoma-style.glb");
+  const { gltf } = await loadTruck();   // one download, shared with the showroom
   const truck = gltf.scene; scene.add(truck);
   const parts = {};
   truck.traverse((o) => {
@@ -652,7 +737,10 @@ async function start3D() {
   controls.addEventListener("start", () => { controls.autoRotate = false; clearTimeout(idle); });
   controls.addEventListener("end", () => { clearTimeout(idle); if (!reduce) idle = setTimeout(() => { if (!selected) controls.autoRotate = true; }, 7000); });
 
+  let onScreen = true;   // skip drawing while the explorer is scrolled out of view
+  new IntersectionObserver(([en]) => { onScreen = en.isIntersecting; }).observe(stage);
   renderer.setAnimationLoop((now) => {
+    if (!onScreen && prog === to) return;
     if (prog !== to) {
       const t = Math.min(1, (now - t0) / DUR), e = ease(t);
       prog = t >= 1 ? to : from + (to - from) * e;
@@ -670,7 +758,522 @@ async function start3D() {
     screenOf: (n) => { const v = new THREE.Vector3(); parts[n].getWorldPosition(v); v.project(camera); const r = canvas.getBoundingClientRect(); return [r.left + (v.x + 1) / 2 * r.width, r.top + (1 - v.y) / 2 * r.height]; } };
 }
 
-fetch("/data/parts.json").then((r) => r.json()).then((j) => { ITEMS = j.items || []; }).catch(() => {}).finally(() => { renderAll(); loadModels(); });
+// ---------------- shared truck download (showroom + explorer) ----------------
+const V = "20261019s";
+let truckLoad = null;
+function loadTruck() {
+  return truckLoad ||= (async () => {
+    const THREE = await import("three");
+    const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
+    const { DRACOLoader } = await import("three/addons/loaders/DRACOLoader.js");
+    const draco = new DRACOLoader().setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/libs/draco/gltf/");
+    const gltf = await new GLTFLoader().setDRACOLoader(draco).loadAsync(`/models/tacoma-style.glb?v=${V}`);
+    // the showroom gets its own copy before the explorer re-skins the original
+    return { THREE, gltf, spare: gltf.scene.clone(true) };
+  })();
+}
+
+// ---------------- truck-bed showroom ----------------
+const showroom = {};
+const KIND_OF = (it) => {
+  const s = spotsOf(it);
+  if (s.some((x) => x.startsWith("running_board"))) return "boards";
+  if (s.includes("tonneau_cover")) return "cover";
+  if (s.some((x) => x.startsWith("wheel"))) return "wheels";
+  if (s.includes("tailgate")) return "panel";
+  if (s.includes("grille") || s.includes("bumper_front") || s.includes("bumper_rear") || s.includes("hood")) return "wide";
+  if (s.some((x) => x.startsWith("taillight"))) return "pair";
+  return "small";
+};
+// shipping box size per kind, metres: [across the bed (label width), height, depth]
+const BOX = { boards: [1.9, 0.34, 0.24], cover: [1.34, 0.64, 0.16], panel: [1.3, 0.6, 0.2], wheels: [0.8, 0.8, 0.8], wide: [1.12, 0.46, 0.34], pair: [0.78, 0.42, 0.4], small: [0.62, 0.44, 0.44] };
+const FILTERS = { all: () => true, boards: (it) => KIND_OF(it) === "boards", covers: (it) => KIND_OF(it) === "cover", fits: (it) => fits(it) };
+const srState = { filter: "all", queue: [], idx: 0 };
+
+function bedQueue() {
+  const live = ITEMS.filter((it) => !it.sold);
+  const real = live.filter((it) => !it.sample).sort((a, b) => String(b.listed || "").localeCompare(String(a.listed || "")));
+  return [...real, ...live.filter((it) => it.sample)].filter(FILTERS[srState.filter]);
+}
+function fitShort(it) {
+  if (it.fitment === "universal") return "Fits most vehicles";
+  const f = it.fitment || [];
+  if (!f.length) return "";
+  const yrs = f[0].years[0] === f[0].years[1] ? f[0].years[0] : `${f[0].years[0]}-${f[0].years[1]}`;
+  // same years + make on every line ("F-250 / F-350 / F-450") reads shorter as one line
+  if (f.every((x) => x.make === f[0].make && x.years[0] === f[0].years[0] && x.years[1] === f[0].years[1]) && f.length > 1)
+    return `Fits ${yrs} ${f[0].make} ${f.map((x) => x.model.replace(/ Super Duty$/, "")).join(" / ")}${/Super Duty/.test(f[0].model) ? " Super Duty" : ""}`;
+  return `Fits ${fitLine(f[0])}${f.length > 1 ? ` +${f.length - 1} more` : ""}`;
+}
+function renderCard() {
+  const q = srState.queue, it = q[srState.idx], el = $("srCard");
+  $("srCount").innerHTML = q.length ? `<b>${srState.idx + 1}</b> / ${q.length}` : "0 / 0";
+  $("srPrev").disabled = $("srNext").disabled = q.length < 2;
+  if (!it) {
+    const v = srState.filter === "fits" ? ` for my ${vehicleName()}` : "";
+    el.innerHTML = `<div class="eyebrow">Nothing in the bed${srState.filter === "fits" ? " for " + esc(vehicleName()) : ""}</div><h2>Ask Sean to find it</h2>
+      <p class="sr-fit">He opens new pallets every week. Send him the part and your vehicle.</p>
+      <div class="sr-acts" style="grid-template-columns:1fr 1fr"><a class="btn" href="${sms(`Hi Sean, what parts do you have${v}? (assimilatedgarage.com)`)}">${ICON_TXT}Text Sean</a><a class="btn ghost" href="tel:${PHONE}">${ICON_CALL}Call</a></div>`;
+    $("srLive").textContent = "No parts match this filter.";
+    return;
+  }
+  const title = titleOf(it), qty = it.qty != null && it.qty !== "" && String(it.qty) !== "1" ? `Qty ${esc(it.qty)}` : "";
+  el.innerHTML = `
+    <div class="eyebrow">${esc(it.brand || "Part")}${it.sample ? ` <span class="badge">Sample listing</span>` : ""}</div>
+    <div class="sr-top"><h2>${esc(it.part || title)}</h2><div class="sr-price">${it.price != null ? money(it.price) : `<span style="font-size:.6em">Ask Sean</span>`}</div></div>
+    ${fitShort(it) ? `<div class="sr-fit">${esc(fitShort(it))}</div>` : ""}
+    <div class="sr-meta">${it.condition ? `<span>${esc(it.condition)}</span>` : ""}${qty ? `<span>${qty}</span>` : ""}${it.partNumber ? `<span>P/N ${esc(it.partNumber)}</span>` : ""}</div>
+    <div class="sr-acts">
+      <button class="btn" type="button" id="srMore">See details</button>
+      <a class="btn ghost" href="${sms(`Hi Sean, is the "${title}"${it.partNumber ? " (" + it.partNumber + ")" : ""} still available? (assimilatedgarage.com)`)}">${ICON_TXT}Text Sean</a>
+      <a class="btn ghost" href="tel:${PHONE}" aria-label="Call Sean">${ICON_CALL}Call</a>
+    </div>`;
+  $("srMore").onclick = () => openDetails(it);
+  $("srLive").textContent = `Part ${srState.idx + 1} of ${q.length}: ${title}, ${it.price != null ? money(it.price) : "price: ask Sean"}`;
+}
+function openDetails(it) {
+  $("shTitle").textContent = titleOf(it);
+  $("shBody").innerHTML = card(it);
+  const d = $("srSheet");
+  if (d.showModal) d.showModal(); else d.setAttribute("open", "");
+}
+$("shClose").onclick = () => $("srSheet").close();
+$("srSheet").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+
+function setFilter(f) {
+  srState.filter = f;
+  document.querySelectorAll("#chips .chip").forEach((c) => c.setAttribute("aria-pressed", c.dataset.f === f));
+  // "Fits my vehicle" borrows the explorer's year / make / model picker while it is on
+  const pick = $("picker"), slot = $("srPick");
+  if (f === "fits") { slot.appendChild(pick); slot.hidden = false; }
+  else if (pick.parentElement === slot) { document.querySelector(".garage .head").appendChild(pick); slot.hidden = true; }
+  refreshQueue();
+}
+function refreshQueue(keepId) {
+  const cur = keepId ?? srState.queue[srState.idx]?.id;
+  srState.queue = bedQueue();
+  const i = srState.queue.findIndex((it) => it.id === cur);
+  srState.idx = i >= 0 ? i : 0;
+  renderCard();
+  showroom.show?.();
+}
+document.querySelectorAll("#chips .chip").forEach((c) => c.onclick = () => setFilter(c.dataset.f));
+showroom.vehicleChanged = () => { if (srState.filter === "fits") refreshQueue(); };
+
+// procedural cardboard + printed box label (canvas textures, no product photos invented)
+function rng(seed) { let h = 2166136261; for (const ch of String(seed)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909)) >>> 0) / 4294967296; }
+function kraft(g, w, h, seed) {
+  const r = rng(seed);
+  g.fillStyle = "#ad8352"; g.fillRect(0, 0, w, h);
+  const gr = g.createLinearGradient(0, 0, w, h); gr.addColorStop(0, "#b98f5d"); gr.addColorStop(.5, "#ab8150"); gr.addColorStop(1, "#a07646");
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  const n = Math.round(w * h / 380);
+  for (let i = 0; i < n; i++) {   // paper fibres
+    const x = r() * w, y = r() * h, l = 2 + r() * 9;
+    g.strokeStyle = r() > .5 ? `rgba(70,45,20,${.05 + r() * .09})` : `rgba(235,205,160,${.05 + r() * .08})`;
+    g.lineWidth = .6 + r(); g.beginPath(); g.moveTo(x, y); g.lineTo(x + l * (r() - .5), y + l * (r() - .5)); g.stroke();
+  }
+  const e = Math.min(w, h) * .12;   // scuffed, darker edges
+  [[0, 0, w, e, 0, 0, 0, e], [0, h - e, w, e, 0, h, 0, h - e], [0, 0, e, h, 0, 0, e, 0], [w - e, 0, e, h, w, 0, w - e, 0]].forEach(([x, y, ww, hh, x0, y0, x1, y1]) => {
+    const lg = g.createLinearGradient(x0, y0, x1, y1); lg.addColorStop(0, "rgba(60,38,15,.28)"); lg.addColorStop(1, "rgba(60,38,15,0)");
+    g.fillStyle = lg; g.fillRect(x, y, ww, hh);
+  });
+}
+function wrapLines(g, text, maxW, maxLines) {
+  const words = String(text).split(/\s+/), lines = [];
+  let line = "";
+  for (const w of words) {
+    const t = line ? line + " " + w : w;
+    if (g.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t;
+  }
+  if (line) lines.push(line);
+  if (lines.length > maxLines) { lines.length = maxLines; lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, "") + "…"; }
+  return lines;
+}
+function barcode(g, x, y, w, h, seed) {
+  const r = rng("bc" + seed); let cx = x;
+  g.fillStyle = "#111";
+  while (cx < x + w) { const bw = 1 + Math.floor(r() * 3.2) * (w / 160); if (r() > .42) g.fillRect(cx, y, bw, h); cx += bw + w / 220; }
+}
+const F_DISP = '"Big Shoulders Display", Impact, sans-serif', F_BODY = '"Public Sans", "Segoe UI", sans-serif', F_MONO = '"IBM Plex Mono", Consolas, monospace';
+function fitFont(g, text, weight, family, maxW, size) { g.font = `${weight} ${size}px ${family}`; const m = g.measureText(text).width; if (m > maxW) { size *= maxW / m; g.font = `${weight} ${size}px ${family}`; } return size; }
+function drawLabel(g, w, h, it) {
+  const title = it.part || titleOf(it), price = it.price != null ? money(it.price) : "ASK SEAN";
+  const wide = w / h > 2.6;
+  // stencil marks printed on the box
+  g.save(); g.globalAlpha = .55; g.fillStyle = "#2a1c0e"; g.strokeStyle = "#2a1c0e";
+  const u = Math.min(w, h);
+  const arrow = (ax, ay, s) => { g.beginPath(); g.moveTo(ax, ay - s); g.lineTo(ax + s * .6, ay - s * .2); g.lineTo(ax + s * .22, ay - s * .2); g.lineTo(ax + s * .22, ay + s * .6); g.lineTo(ax - s * .22, ay + s * .6); g.lineTo(ax - s * .22, ay - s * .2); g.lineTo(ax - s * .6, ay - s * .2); g.closePath(); g.fill(); };
+  if (wide) {
+    arrow(h * .32, h * .42, h * .2); arrow(h * .72, h * .42, h * .2);
+    g.font = `700 ${h * .1}px ${F_MONO}`; g.textAlign = "center"; g.fillText("THIS SIDE UP", h * .52, h * .82);
+    g.font = `900 ${h * .3}px ${F_DISP}`; g.textAlign = "right"; g.fillText("AG", w - h * .2, h * .62);
+  } else {
+    g.font = `700 ${u * .045}px ${F_MONO}`; g.textAlign = "left"; g.fillText("ASSIMILATED GARAGE · POWAY CA", w * .07, h * .085);
+    arrow(w - u * .16, u * .11, u * .055); arrow(w - u * .28, u * .11, u * .055);
+    g.font = `700 ${u * .04}px ${F_MONO}`; g.textAlign = "right"; g.fillText("HANDLE WITH CARE", w - w * .07, h - h * .05);
+  }
+  g.restore();
+  // the white shipping label
+  let lx, ly, lw, lh;
+  if (wide) { lw = w * .62; lh = h * .78; lx = h * 1.08; ly = (h - lh) / 2; }
+  else { lw = w * .84; lh = Math.min(h * .74, lw * .78); lx = (w - lw) / 2; ly = h * .13 + (h * .8 - lh) / 2; }
+  g.save(); g.shadowColor = "rgba(40,25,10,.35)"; g.shadowBlur = u * .012; g.shadowOffsetY = u * .004;
+  g.fillStyle = "#f3f0e7"; g.fillRect(lx, ly, lw, lh); g.restore();
+  g.strokeStyle = "#1b1b1b"; g.lineWidth = Math.max(2, lh * .012); g.strokeRect(lx + lh * .03, ly + lh * .03, lw - lh * .06, lh - lh * .06);
+  const p = lh * .08, ix = lx + p, iy = ly + p, iw = lw - 2 * p, ih = lh - 2 * p;
+  g.fillStyle = "#111"; g.textBaseline = "alphabetic"; g.textAlign = "left";
+  if (wide) {
+    const pw = iw * .3;   // price block on the right
+    g.fillRect(ix + iw - pw, iy, pw, ih);
+    g.fillStyle = "#f3c316"; g.textAlign = "center";
+    fitFont(g, price, 900, F_DISP, pw * .86, ih * .62); g.fillText(price, ix + iw - pw / 2, iy + ih * .7);
+    g.fillStyle = "#111"; g.textAlign = "left";
+    const tw = iw - pw - p;
+    fitFont(g, String(it.brand || "PART").toUpperCase(), 900, F_DISP, tw, ih * .34); g.fillText(String(it.brand || "PART").toUpperCase(), ix, iy + ih * .3);
+    g.font = `600 ${ih * .15}px ${F_BODY}`;
+    wrapLines(g, title, tw, 2).forEach((l, i) => g.fillText(l, ix, iy + ih * (.52 + i * .18)));
+    g.font = `600 ${ih * .12}px ${F_MONO}`;
+    g.fillText(it.partNumber ? `P/N ${it.partNumber}` : String(it.condition || "").toUpperCase(), ix, iy + ih * .97);
+    barcode(g, ix + tw * .58, iy + ih * .82, tw * .4, ih * .17, it.id);
+  } else {
+    g.fillRect(ix, iy, iw, ih * .13);   // header bar
+    g.fillStyle = "#f3f0e7"; g.font = `600 ${ih * .072}px ${F_MONO}`;
+    g.fillText("ASSIMILATED GARAGE", ix + ih * .03, iy + ih * .092);
+    g.textAlign = "right"; g.fillText(it.qty != null && String(it.qty) !== "1" ? `QTY ${it.qty}` : "QTY 1", ix + iw - ih * .03, iy + ih * .092);
+    g.textAlign = "left"; g.fillStyle = "#111";
+    fitFont(g, String(it.brand || (it.sample ? "SAMPLE" : "PART")).toUpperCase(), 900, F_DISP, iw, ih * .22);
+    g.fillText(String(it.brand || (it.sample ? "SAMPLE" : "PART")).toUpperCase(), ix, iy + ih * .36);
+    g.font = `600 ${ih * .085}px ${F_BODY}`;
+    const lines = wrapLines(g, title.replace(/\s*\(SAMPLE\)/, ""), iw, 2);
+    lines.forEach((l, i) => g.fillText(l, ix, iy + ih * (.49 + i * .1)));
+    g.font = `600 ${ih * .066}px ${F_MONO}`;
+    g.fillText(it.partNumber ? `P/N ${it.partNumber}` : String(it.condition || "").toUpperCase(), ix, iy + ih * .7);
+    g.fillRect(ix, iy + ih * .755, iw, Math.max(2, ih * .008));
+    barcode(g, ix, iy + ih * .8, iw * .48, ih * .2, it.id);
+    g.textAlign = "right";
+    fitFont(g, price, 900, F_DISP, iw * .48, ih * .26); g.fillText(price, ix + iw, iy + ih);
+    g.textAlign = "left";
+  }
+  if (it.sample) {   // rubber-stamp so placeholders never read as real stock
+    g.save(); g.translate(lx + lw * .72, ly + lh * .42); g.rotate(-.18);
+    g.strokeStyle = "rgba(180,40,25,.85)"; g.fillStyle = "rgba(180,40,25,.85)"; g.lineWidth = lh * .02;
+    g.font = `900 ${lh * .14}px ${F_DISP}`; g.textAlign = "center"; g.textBaseline = "middle";
+    const sw = g.measureText("SAMPLE").width + lh * .1;
+    g.strokeRect(-sw / 2, -lh * .09, sw, lh * .18); g.fillText("SAMPLE", 0, lh * .005);
+    g.restore();
+  }
+}
+
+async function startShowroom() {
+  const { THREE, spare: truck } = await loadTruck();
+  const { RoomEnvironment } = await import("three/addons/environments/RoomEnvironment.js");
+  const { RoundedBoxGeometry } = await import("three/addons/geometries/RoundedBoxGeometry.js");
+  await Promise.race([Promise.all([document.fonts.load(`900 40px ${F_DISP}`), document.fonts.load(`600 20px ${F_BODY}`), document.fonts.load(`600 20px ${F_MONO}`)]), new Promise((r) => setTimeout(r, 2500))]);
+
+  const canvas = $("bedCanvas"), stage = $("srStage");
+  const small = matchMedia("(max-width: 700px)").matches;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const aniso = renderer.capabilities.getMaxAnisotropy();
+  const scene = new THREE.Scene();
+  const BG = new THREE.Color(0x0d0e0b);
+  scene.background = BG; scene.fog = new THREE.Fog(BG, 10, 24);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.45;
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
+
+  // night garage: one warm work light over the bed, cool rim from the cab side, a little sky fill
+  const key = new THREE.SpotLight(0xffeedd, 150, 22, 0.6, 0.6, 2);
+  key.position.set(-4.6, 6.6, 2.4); key.target.position.set(-1.7, 0.6, 0); scene.add(key, key.target);
+  key.castShadow = true; key.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048); key.shadow.bias = -0.0002; key.shadow.normalBias = 0.02;
+  key.shadow.camera.near = 3; key.shadow.camera.far = 16;
+  const rim = new THREE.DirectionalLight(0xa8c2ff, 2.2); rim.position.set(7, 4.5, -4); scene.add(rim);
+  const rim2 = new THREE.DirectionalLight(0xffd9a8, 0.9); rim2.position.set(4, 3, 6); scene.add(rim2);
+  scene.add(new THREE.HemisphereLight(0xc9d4ff, 0x15130e, 0.3));
+  const boxRim = new THREE.PointLight(0xffcf80, 5, 3.5, 2); scene.add(boxRim);   // warm kicker behind the box
+
+  // floor: dark sealed concrete + a soft contact shadow under the truck
+  // the floor is unlit (a painted pool of work-light) so the rim lights only touch the truck; shadows land on a catcher
+  const fc = document.createElement("canvas"); fc.width = fc.height = 512;
+  const fgc = fc.getContext("2d"), fgr = fgc.createRadialGradient(256, 256, 0, 256, 256, 256);
+  fgr.addColorStop(0, "#2e2c26"); fgr.addColorStop(0.2, "#1e1d19"); fgr.addColorStop(0.42, "#121310"); fgr.addColorStop(1, "#0d0e0b");
+  fgc.fillStyle = fgr; fgc.fillRect(0, 0, 512, 512);
+  const fr = rng("floor"); for (let i = 0; i < 9000; i++) { fgc.fillStyle = `rgba(${fr() > .5 ? "255,255,255" : "0,0,0"},${fr() * .035})`; fgc.fillRect(fr() * 512, fr() * 512, 1.5, 1.5); }
+  const floorTex = new THREE.CanvasTexture(fc); floorTex.colorSpace = THREE.SRGBColorSpace;
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshBasicMaterial({ map: floorTex, toneMapped: false }));
+  floor.rotation.x = -Math.PI / 2; floor.position.set(-1.6, 0, 0); scene.add(floor);
+  const catcher = new THREE.Mesh(new THREE.PlaneGeometry(22, 22), new THREE.ShadowMaterial({ opacity: 0.5 }));
+  catcher.rotation.x = -Math.PI / 2; catcher.position.set(-1.6, 0.002, 0); catcher.receiveShadow = true; scene.add(catcher);
+  const c2 = document.createElement("canvas"); c2.width = c2.height = 256;
+  const g2 = c2.getContext("2d"), gr = g2.createRadialGradient(128, 128, 10, 128, 128, 128);
+  gr.addColorStop(0, "rgba(0,0,0,.8)"); gr.addColorStop(.55, "rgba(0,0,0,.4)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+  g2.fillStyle = gr; g2.fillRect(0, 0, 256, 256);
+  const blob = new THREE.Mesh(new THREE.PlaneGeometry(7.4, 3.2), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c2), transparent: true, depthWrite: false }));
+  blob.rotation.x = -Math.PI / 2; blob.position.y = 0.004; scene.add(blob);
+  // painted bay line on the floor
+  const line = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 9), new THREE.MeshBasicMaterial({ color: 0x7a6618 }));
+  line.rotation.x = -Math.PI / 2; line.position.set(-3.6, 0.005, -1.7); line.rotation.z = Math.PI / 2; line.scale.set(1, 0.6, 1); scene.add(line);
+
+  // the truck: charcoal metallic paint, tonneau off, tailgate on a hinge
+  const paint = new THREE.MeshPhysicalMaterial({ color: 0x45484c, metalness: 0.7, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.04, envMapIntensity: 1.6 });
+  const glass = new THREE.MeshPhysicalMaterial({ color: 0x0b1014, roughness: 0.02, metalness: 0.1, transparent: true, opacity: 0.8, clearcoat: 1 });
+  truck.traverse((o) => {
+    if (!o.isMesh) return;
+    o.castShadow = true; o.receiveShadow = true;
+    if (o.material.name === "paint") o.material = paint;
+    else if (o.material.name === "glass") o.material = glass;
+  });
+  scene.add(truck);
+  const ton = truck.getObjectByName("tonneau_cover"); if (ton) ton.visible = false;
+  const tg = truck.getObjectByName("tailgate");
+  const hinge = new THREE.Group();
+  if (tg) { hinge.position.set(tg.position.x, tg.position.y - 0.335, 0); truck.add(hinge); hinge.attach(tg); }
+  truck.updateMatrixWorld(true);
+
+  // find the bed floor and inner walls by casting rays at the bed mesh
+  const bedObj = truck.getObjectByName("bed"), bedBox = new THREE.Box3().setFromObject(bedObj);
+  const bedCX = (bedBox.min.x + bedBox.max.x) / 2, railY = bedBox.max.y;
+  const rc = new THREE.Raycaster();
+  rc.set(new THREE.Vector3(bedCX, railY + 0.5, 0.2), new THREE.Vector3(0, -1, 0));
+  const fh = rc.intersectObject(bedObj, true).find((h) => h.point.y < railY - 0.15);
+  const floorY = fh ? fh.point.y : railY - 0.5;
+  rc.set(new THREE.Vector3(bedCX, floorY + 0.25, 0), new THREE.Vector3(0, 0, 1));
+  const wh = rc.intersectObject(bedObj, true)[0];
+  const innerHalf = wh ? wh.point.z : 0.72;
+  showroom.debug = { floorY, railY, innerHalf, bedCX };
+
+  // cardboard materials (shared) + per-item label faces (cached)
+  const kc = document.createElement("canvas"); kc.width = kc.height = 512; kraft(kc.getContext("2d"), 512, 512, "side");
+  const kraftTex = new THREE.CanvasTexture(kc); kraftTex.colorSpace = THREE.SRGBColorSpace; kraftTex.anisotropy = aniso;
+  const tc = document.createElement("canvas"); tc.width = 512; tc.height = 512; const tg2 = tc.getContext("2d"); kraft(tg2, 512, 512, "top");
+  tg2.fillStyle = "rgba(196,160,104,.9)"; tg2.fillRect(200, 0, 112, 512);   // packing tape down the seam
+  tg2.fillStyle = "rgba(255,240,210,.18)"; tg2.fillRect(206, 0, 10, 512); tg2.fillStyle = "rgba(60,40,15,.5)"; tg2.fillRect(255, 0, 2, 512);
+  const topTex = new THREE.CanvasTexture(tc); topTex.colorSpace = THREE.SRGBColorSpace; topTex.anisotropy = aniso;
+  const sideMat = new THREE.MeshStandardMaterial({ map: kraftTex, roughness: 0.9 });
+  const topMat = new THREE.MeshStandardMaterial({ map: topTex, roughness: 0.75 });
+  const faces = new Map();
+  function faceTex(it, W, H) {
+    const key = it.id + ":" + W + "x" + H;
+    if (faces.has(key)) return faces.get(key);
+    const asp = W / H, base = asp > 2.5 ? 2048 : 1024;
+    const cw = asp >= 1 ? base : Math.round(base * asp), ch = asp >= 1 ? Math.round(base / asp) : base;
+    const c = document.createElement("canvas"); c.width = cw; c.height = ch;
+    const g = c.getContext("2d"); kraft(g, cw, ch, it.id); drawLabel(g, cw, ch, it);
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = aniso;
+    const photo = (it.photos || [])[0] || it.photo;
+    if (photo) {   // Sean's own photo printed on the box face, label strip kept underneath
+      const img = new Image(); img.decoding = "async";
+      img.onload = () => {
+        const m = Math.min(cw, ch) * .06, aw = cw - 2 * m, ah = ch * .64 - m;
+        const s = Math.max(aw / img.width, ah / img.height), sw = aw / s, sh = ah / s;
+        g.save(); g.fillStyle = "#f3f0e7"; g.fillRect(m * .6, m * .6, aw + m * .8, ah + m * .8);
+        g.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, m, m, aw, ah); g.restore();
+        tex.needsUpdate = true;
+      };
+      img.src = photo;
+    }
+    faces.set(key, tex);
+    return tex;
+  }
+  function makeCrate(it) {
+    const kind = KIND_OF(it), [W, H, D] = BOX[kind];
+    // BoxGeometry faces: +x, -x, +y, -y, +z, -z ; the camera looks from -x (behind the truck)
+    const geo = new RoundedBoxGeometry(D, H, W, 3, Math.min(0.018, D * 0.12));
+    const label = new THREE.MeshStandardMaterial({ map: faceTex(it, W, H), roughness: 0.82 });
+    const mats = [sideMat, label, topMat, sideMat, sideMat, sideMat];
+    const mesh = new THREE.Mesh(geo, reduce ? mats.map((m) => { const c = m.clone(); c.transparent = true; return c; }) : mats);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    const onRails = W > innerHalf * 2 - 0.04;   // too long for the floor: it rides across the bed rails
+    const lean = !onRails && D < 0.26 && H > 0.5 ? 0.07 : 0;
+    const baseY = (onRails ? railY + 0.012 : floorY + 0.012) + H / 2;
+    const restX = onRails ? bedCX - 0.05 : bedCX - 0.18 + (lean ? 0.5 : 0);
+    const holder = new THREE.Group(); holder.add(mesh);
+    mesh.rotation.z = -lean; mesh.position.y = 0;
+    holder.position.set(restX, baseY, 0);
+    holder.userData = { it, baseY, restX, H, W, phase: Math.random() * 6, label };
+    return holder;
+  }
+  function disposeCrate(c) {
+    scene.remove(c);
+    const m = c.children[0]; m.geometry.dispose(); c.userData.label.dispose();
+    if (reduce) m.material.forEach((x) => x.dispose());
+  }
+
+  // framing: behind the truck, slightly high, looking into the open bed; leave room for the info card
+  const target = new THREE.Vector3(bedCX - 0.15, floorY + 0.35, 0);
+  const viewDir = new THREE.Vector3(-1, 0.42, 0.34).normalize();
+  let dist = 8, W = 1, H = 1;
+  function resize() {
+    W = stage.clientWidth; H = stage.clientHeight;
+    renderer.setSize(W, H, false);
+    const phone = W <= 700;
+    const sy = phone ? Math.round(Math.min(H * 0.4, 225)) : 0, sx = phone ? 0 : 414;
+    camera.aspect = W / H;
+    camera.setViewOffset(W + sx, H + sy, 0, sy, W, H);
+    const t2 = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const needW = phone ? 2.55 : 4.3, needH = phone ? 2.2 : 3.0;
+    const availH = H - sy, availW = W - sx * 0.6;
+    dist = Math.max(needH * (H + sy) / (availH * t2), needW * (H + sy) / (availW * t2));
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  new ResizeObserver(resize).observe(stage);
+
+  // ---- animation state ----
+  const clamp01 = (x) => Math.max(0, Math.min(1, x));
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3), easeInCubic = (t) => t * t * t;
+  let cur = null, outs = [], busy = 0, introT0 = performance.now();
+  const INTRO = !reduce;
+  hinge.rotation.z = INTRO ? 0 : Math.PI / 2 - 0.02;
+  let drag = null, dragZ = 0;
+
+  function show(dir = 0) {
+    const it = srState.queue[srState.idx];
+    if (cur && cur.userData.it === it && !dir) return;
+    if (cur) { cur.userData.anim = { kind: reduce ? "fadeOut" : "out", t0: performance.now(), dir: dir || 1, z0: cur.position.z }; outs.push(cur); cur = null; }
+    if (!it) return;
+    cur = makeCrate(it); scene.add(cur);
+    const now = performance.now();
+    cur.userData.anim = reduce ? { kind: "fadeIn", t0: now } : dir ? { kind: "in", t0: now + 90, dir } : { kind: "drop", t0: Math.max(now, introT0 + (INTRO ? 1050 : 0)) };
+    applyAnim(cur, now);
+    // warm up the neighbours' label textures so the next swipe is instant
+    const q = srState.queue;
+    [1, -1].forEach((d) => { const n = q[(srState.idx + d + q.length) % q.length]; if (n) { const b = BOX[KIND_OF(n)]; faceTex(n, b[0], b[1]); } });
+  }
+  showroom.show = () => show(0);
+  function go(dir) {
+    const q = srState.queue; if (q.length < 2) return;
+    srState.idx = (srState.idx + dir + q.length) % q.length;
+    const el = $("srCard"); el.classList.add("swap");
+    setTimeout(() => { renderCard(); el.classList.remove("swap"); }, reduce ? 0 : 160);
+    show(dir); busy = performance.now();
+  }
+  showroom.go = go;
+
+  function applyAnim(c, now) {
+    const a = c.userData.anim, u = c.userData, m = c.children[0];
+    if (!a) return;
+    const t = (now - a.t0) / 1000;
+    if (a.kind === "out") {   // lifts out of the bed and swings off the side
+      const p = clamp01(t / 0.62);
+      c.position.z = a.z0 + -a.dir * 3.6 * easeInCubic(p);
+      c.position.y = u.baseY + 0.95 * easeOutCubic(Math.min(1, p * 1.6));
+      m.rotation.x = a.dir * 0.32 * p;
+      if (p >= 1) a.done = true;
+    } else if (a.kind === "in") {   // swings in from the other side, drops into the bed with a bounce
+      const p = clamp01(t / 0.82);
+      c.position.z = a.dir * 3.6 * (1 - easeOutCubic(Math.min(1, p / 0.7)));
+      const fall = clamp01((p - 0.35) / 0.4);
+      let y = 0.95 * (1 - fall * fall);
+      if (p > 0.75) { const b = (p - 0.75) / 0.25; y += 0.07 * Math.sin(b * Math.PI) * (1 - b); }
+      c.position.y = u.baseY + (p < 0.35 ? 0.95 : y);
+      m.rotation.x = -a.dir * 0.3 * Math.pow(1 - Math.min(1, p / 0.8), 2);
+      const land = p > 0.75 ? Math.sin((p - 0.75) / 0.25 * Math.PI) : 0;
+      m.scale.set(1 + land * 0.03, 1 - land * 0.05, 1 + land * 0.03);
+      if (p >= 1) { delete u.anim; m.scale.set(1, 1, 1); m.rotation.x = 0; }
+    } else if (a.kind === "drop") {   // first crate lowers into the bed after the tailgate falls
+      const p = clamp01(t / 0.75);
+      let y = 1.3 * Math.pow(1 - Math.min(1, p / 0.62), 2);
+      if (p > 0.62) { const b = (p - 0.62) / 0.38; y = 0.06 * Math.sin(b * Math.PI) * (1 - b); }
+      c.position.y = u.baseY + y; c.visible = t >= 0;
+      if (p >= 1) delete u.anim;
+    } else if (a.kind === "snap") {
+      const p = clamp01(t / 0.35); c.position.z = a.z0 * (1 - easeOutCubic(p)); if (p >= 1) delete u.anim;
+    } else if (a.kind === "fadeIn" || a.kind === "fadeOut") {
+      const p = clamp01(t / 0.3), o = a.kind === "fadeIn" ? p : 1 - p;
+      m.material.forEach((x) => { x.opacity = o; });
+      if (p >= 1) { if (a.kind === "fadeOut") a.done = true; else { m.material.forEach((x) => { x.opacity = 1; }); delete u.anim; } }
+    }
+  }
+
+  // ---- input: swipe / drag, wheel, keys, arrows ----
+  canvas.addEventListener("pointerdown", (e) => {
+    if (!cur) return;
+    drag = { x: e.clientX, y: e.clientY, t: performance.now(), on: false, id: e.pointerId };
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.on && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.2) { drag.on = true; canvas.setPointerCapture(e.pointerId); canvas.classList.add("grabbing"); if (cur) delete cur.userData.anim; }
+    if (drag.on && cur && !reduce) { dragZ = dx / W * 3.2; cur.position.z = dragZ; }
+  });
+  const endDrag = (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, vel = dx / Math.max(1, performance.now() - drag.t), was = drag.on;
+    drag = null; canvas.classList.remove("grabbing");
+    if (!was) return;
+    if (Math.abs(dx) > Math.min(70, W * 0.15) || Math.abs(vel) > 0.5) go(dx < 0 ? 1 : -1);
+    else if (cur) cur.userData.anim = { kind: "snap", t0: performance.now(), z0: cur.position.z };
+  };
+  canvas.addEventListener("pointerup", endDrag); canvas.addEventListener("pointercancel", endDrag);
+  // wheel steps through the bed, then lets the page scroll on past the last (or first) part
+  let wheelAcc = 0, wheelLock = 0;
+  stage.addEventListener("wheel", (e) => {
+    const q = srState.queue; if (q.length < 2 || e.ctrlKey) return;
+    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    const dir = d > 0 ? 1 : -1;
+    if (Math.abs(e.deltaY) >= Math.abs(e.deltaX) && ((dir > 0 && srState.idx === q.length - 1) || (dir < 0 && srState.idx === 0))) return;
+    e.preventDefault();
+    const now = performance.now();
+    if (now < wheelLock) return;
+    wheelAcc += d;
+    if (Math.abs(wheelAcc) > 40) { wheelAcc = 0; wheelLock = now + 520; go(dir); }
+  }, { passive: false });
+  $("srPrev").onclick = () => go(-1); $("srNext").onclick = () => go(1);
+  let srVisible = true;
+  new IntersectionObserver(([en]) => { srVisible = en.intersectionRatio > 0.01; showroom.inView = en.intersectionRatio > 0.5; }, { threshold: [0, 0.02, 0.5, 1] }).observe(stage);
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    const a = document.activeElement, inStage = stage.contains(a);
+    if (!inStage && !(showroom.inView && (a === document.body || a === null))) return;
+    if ($("srSheet").open) return;
+    e.preventDefault(); go(e.key === "ArrowRight" ? 1 : -1);
+  });
+
+  // ---- render loop ----
+  const tmp = new THREE.Vector3();
+  renderer.setAnimationLoop((now) => {
+    if (!srVisible) return;
+    const t = (now - introT0) / 1000, ts = now / 1000;
+    // intro: slow dolly in while the tailgate drops onto its cables
+    const ci = INTRO ? easeOutCubic(clamp01(t / 1.8)) : 1;
+    camera.position.copy(target).addScaledVector(viewDir, dist * (1.22 - 0.22 * ci));
+    camera.position.y += (1 - ci) * 0.6;
+    if (!reduce) camera.position.z += Math.sin(ts * 0.25) * 0.08;   // a breath of parallax
+    camera.lookAt(target);
+    if (INTRO) {
+      const p = clamp01((t - 0.35) / 0.85);
+      hinge.rotation.z = p < 0.72 ? (Math.PI / 2) * Math.pow(p / 0.72, 2) : Math.PI / 2 - 0.09 * Math.sin((p - 0.72) / 0.28 * Math.PI) * (1 - (p - 0.72) / 0.28);
+      hinge.rotation.z = Math.min(hinge.rotation.z, Math.PI / 2) - 0.02 * Math.min(1, p * 1.4);
+    }
+    outs = outs.filter((c) => { applyAnim(c, now); if (c.userData.anim?.done) { disposeCrate(c); return false; } return true; });
+    if (cur) {
+      if (cur.userData.anim) applyAnim(cur, now);
+      if (!reduce && !drag?.on) {   // idle hover
+        const m = cur.children[0], ph = cur.userData.phase;
+        m.position.y = 0.014 * (0.5 + 0.5 * Math.sin(ts * 1.6 + ph));
+        m.rotation.y = 0.025 * Math.sin(ts * 0.8 + ph);
+      }
+      cur.getWorldPosition(tmp);
+      boxRim.position.set(tmp.x + 0.9, tmp.y + cur.userData.H * 0.5 + 0.7, tmp.z + 0.4);
+    }
+    renderer.render(scene, camera);
+  });
+  $("srLoading").classList.add("done");
+  show(0);
+  window.__bed = { go, srState, debug: showroom.debug, camera };
+}
+
+fetch("/data/parts.json", { cache: "no-cache" }).then((r) => r.json()).then((j) => { ITEMS = j.items || []; }).catch(() => {}).finally(() => {
+  renderAll();
+  srState.queue = bedQueue(); renderCard();
+  startShowroom().catch((err) => { console.error(err); $("srLoading").textContent = "3D VIEW UNAVAILABLE"; });
+  loadModels();
+});
 </script>
 </body>
 </html>
